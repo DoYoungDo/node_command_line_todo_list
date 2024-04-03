@@ -45,8 +45,9 @@ namespace TODO {
             const table = JSON.parse(fs.readFileSync(file).toString());
 
             const begin = dayjs(Date.now()).format("YYYY-MM-DD HH:mm:ss SSS");
-            const todos = args.map(arg => {
+            const todos = args.map((arg, index) => {
                 let item: TODO_Item = {
+                    index: table.list.length - 1 + index + 1,
                     todo: arg,
                     done: options.done,
                     begin,
@@ -66,7 +67,7 @@ namespace TODO {
     export function actionRemove(args: string[]) {
         const indexSet: Set<number> = new Set;
         for (let arg of args) {
-            const res = /(\d+)-(\d+)/.exec(arg);
+            const res = /^(\d+)-(\d+)$/.exec(arg);
             if (res) {
                 const start = Number.parseInt(res[1]);
                 const end = Number.parseInt(res[2]);
@@ -83,7 +84,7 @@ namespace TODO {
                     }
                 }
             }
-            else if (/\d+/.test(arg)) {
+            else if (/^\d+$/.test(arg)) {
                 indexSet.add(Number.parseInt(arg));
                 continue;
             }
@@ -137,13 +138,70 @@ namespace TODO {
         } 
 
     }
-    export function actionList(args: string[], options: any, list: Command) {
+    export function actionList(arg: string, options: any, list: Command) {
         try {
             const file = path.resolve(__dirname, "../static/todolist-table.json");
-            const table = JSON.parse(fs.readFileSync(file).toString());
-            printer.printTable(table.list);
+            const table = JSON.parse(fs.readFileSync(file).toString()) as TODO_Table;
+            
+            if (options.count){
+                printer.printLine("count:", table.list.length);
+                return;
+            }
+
+            const [begin, end] = getRange();
+
+            const list = table.list.filter((item, index) => {
+                if (begin && index < begin) {
+                    return false;
+                }
+
+                if(end && index > end){
+                    return false
+                }
+
+                if (options.done) {
+                    if (/true/.test(options.done)) {
+                        return item.done
+                    }
+                    else if(/false/.test(options.done)){
+                        return !item.done
+                    }
+                }
+
+                return true;
+            })
+
+            printer.printTable(list, ["index", "todo", "done", "begin", "end"]);
         } catch (error) {
             console.trace(error);
+        }
+
+        function getRange(): [number | undefined/* begin */, number | undefined/* end */] {
+            if(!arg){
+                return [undefined, undefined];
+            }
+
+            const input = arg.trim();
+            if (/^(\d+)$/.test(input)) {
+                return [Number.parseInt(input), undefined];
+            }
+        
+            let regRes = /^\[?(\d+)-?$/.exec(arg.trim());
+            if(regRes && regRes.length){
+                return [Number.parseInt(regRes[1]), undefined];
+            }
+            
+            regRes = /^(\d+)\]$/.exec(arg.trim());
+            if(regRes && regRes.length){
+                return [undefined, Number.parseInt(regRes[1])];
+            }
+
+            regRes = /^\[?(\d+)-(\d+)\]?$/.exec(arg.trim());
+            if(regRes && regRes.length){
+                return [Number.parseInt(regRes[1]), Number.parseInt(regRes[2])];
+            }
+
+            return [undefined, undefined];
         }
     }
     export function actionDone(args: string[]){
@@ -266,6 +324,16 @@ namespace TODO {
 
     app.command(TODO.CommandName.LIST)
         .description("显示 待办项")
+        .argument("[range]", ["显示范围",
+            "起始：[start | [start-，结束缺省:max",
+            "结束：end]，起始缺省：0",
+            "起始-结束：[start-end] | start-end",
+            "例：",
+            "查看起始位置为12的：[12 或 [12- ",
+            "查看起始位置为12结束位置为14的：12-14 或 [12-14]",
+            "查看起始位置为0结束位置为14的：14],14] = [0-14] = 0-14"].join("\n"))
+        .option("-d --done [done[true|false]]", "只显示完成的")
+        .option("-c --count", "显示数量", false)
         .action(TODO.actionList);
 
     app.command(TODO.CommandName.DONE)

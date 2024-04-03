@@ -4,8 +4,8 @@ export class Printer {
         console.table(tabularData, properties);
     }
 
-    printLine(line:any):void{
-        console.log(line);
+    printLine(...line: any[]): void {
+        console.log(...line);
     }
 }
 

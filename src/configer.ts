@@ -3,11 +3,11 @@ import * as path from "path";
 import * as fs from "fs";
 import { Loger, Printer } from "./types";
 
-type VarName = keyof typeof VARIABLES_INFO;
+type VarName = Var;
 type Value = string;
 type Description = string;
 
-const VARIABLES_INFO:Record<string,Description> = {
+const VARIABLES_INFO: Record<VarName, Description> = {
     table: "表",
     author: "作者"
 }
@@ -18,7 +18,10 @@ const DEFAULT_CONFIG: LocalConfig = {
     author: "default"
 }
 
-
+export enum Var {
+    TABLE = "table",
+    AUTHOR = "author"
+}
 // type Var = {
 //     name: keyof typeof VARIABLES_INFO
 //     description: string
@@ -26,15 +29,18 @@ const DEFAULT_CONFIG: LocalConfig = {
 
 export class Configer {
     private _configs: LocalConfig = DEFAULT_CONFIG;
+    private readonly _CONFIG_PATH: string;
 
     constructor(
         private _loger: Loger,
         private _printer: Printer
     ) {
+        this._CONFIG_PATH = path.join(os.homedir(), ".todo");
+
         this.checkLocal();
     }
 
-    get vars(): Record<keyof typeof VARIABLES_INFO, Description> {
+    get vars(): Record<Var, Description> {
         return VARIABLES_INFO;
     }
 
@@ -43,24 +49,23 @@ export class Configer {
     }
 
     setConfig(key: VarName, value: Value) {
-
+        this._configs[key] = value;
+        this.syncConfigToLocal();
     }
 
     getConfig(key: VarName): Value {
-        return ""
+        return this._configs[key];
     }
     
     private checkLocal(){
-        const DIR_NAME = ".todo";
-
-        const configFile = path.join(os.homedir(), DIR_NAME);
-        if (!fs.existsSync(configFile)){
-            fs.writeFileSync(configFile, JSON.stringify(DEFAULT_CONFIG, null, "  "));
-        }
-        else{
-            const data: LocalConfig = JSON.parse(fs.readFileSync(configFile).toString()) as LocalConfig;
+        if (fs.existsSync(this._CONFIG_PATH)) {
+            const data: LocalConfig = JSON.parse(fs.readFileSync(this._CONFIG_PATH).toString()) as LocalConfig;
             this._configs = data;
         }
+    }
+
+    private syncConfigToLocal() {
+        fs.writeFileSync(this._CONFIG_PATH, JSON.stringify(this._configs, null, "  "));
     }
 }
 

@@ -1,9 +1,10 @@
 import * as path from "path";
 import * as fs from "fs";
+import * as os from "os";
 import * as dayjs from "dayjs";
 import * as readLine from "readline";
 import { Command } from "commander";
-import { Configer, Loger, Printer, TODO_Item, TODO_Table } from "./types";
+import { Configer, Loger, Printer, TODO_Item, TODO_Table, Var } from "./types";
 
 namespace APP{
     export const NAME = "todo";
@@ -41,10 +42,9 @@ namespace TODO {
     }
     export function actionAdd(args: string[], options: any, add: Command) {
         try {
-            const file = path.resolve(__dirname, "../static/todolist-table.json");
-            const table = JSON.parse(fs.readFileSync(file).toString());
-
-            const begin = dayjs(Date.now()).format("YYYY-MM-DD HH:mm:ss SSS");
+            const table = Internal.getTodoTable();
+            
+            const begin = Internal.getFormatDate(Date.now());
             const todos = args.map((arg, index) => {
                 let item: TODO_Item = {
                     index: table.list.length - 1 + index + 1,
@@ -57,9 +57,10 @@ namespace TODO {
             })
 
             printer.printTable([...table.list.map((item: any) => { return {} }), ...todos]);
-
+            
             table.list.push(...todos);
-            fs.writeFileSync(file, JSON.stringify(table, null, "    "));
+
+            Internal.updateTodoTableToLocal(table);
         } catch (error) {
             console.trace(error);
         }
@@ -96,12 +97,12 @@ namespace TODO {
         
         // const indexs: number[] = args.map(arg => Number.parseInt(arg)).filter(num => !isNaN(num));
         try {
-            const file = path.resolve(__dirname, "../static/todolist-table.json");
-            const table = JSON.parse(fs.readFileSync(file).toString());
+            const table = Internal.getTodoTable();
             const list = (table.list as any[]).filter((_, index) => !indexSet.has(index));
             table.list = list;
-            fs.writeFileSync(file, JSON.stringify(table, null, "    "));
             printer.printTable(table.list);
+
+            Internal.updateTodoTableToLocal(table);
         } catch (error) {
             console.trace(error);
         }
@@ -116,8 +117,7 @@ namespace TODO {
         const todo = arg1;
 
         try {
-            const file = path.resolve(__dirname, "../static/todolist-table.json");
-            const table :TODO_Table= JSON.parse(fs.readFileSync(file).toString());
+            const table: TODO_Table = Internal.getTodoTable();
             const item: TODO_Item | undefined = table.list.find((_, i) => i === index);
             if(!item){
                 loger.logErr("index out if reange.", "todo list length:", `${table.list.length}`);
@@ -127,12 +127,11 @@ namespace TODO {
             option.append ? item.todo += todo : item.todo = todo;
             option.done ? item.done = option.done : void 0;
 
-            fs.writeFileSync(file, JSON.stringify(table, null, "    "));
-
             const todos: any[] = new Array(index).fill({},0,index);
             todos.push(item);
             printer.printTable(todos);
 
+            Internal.updateTodoTableToLocal(table);
         } catch (error) {
             console.trace(error);
         } 
@@ -140,9 +139,7 @@ namespace TODO {
     }
     export function actionList(arg: string, options: any, list: Command) {
         try {
-            const file = path.resolve(__dirname, "../static/todolist-table.json");
-            const table = JSON.parse(fs.readFileSync(file).toString()) as TODO_Table;
-            
+            const table = Internal.getTodoTable();
             if (options.count){
                 printer.printLine("count:", table.list.length);
                 return;
@@ -206,12 +203,11 @@ namespace TODO {
     }
     export function actionDone(args: string[]){
         const indexs: number[] = args.map(arg => Number.parseInt(arg)).filter(num => !isNaN(num));
-        const date = dayjs(Date.now()).format("YYYY-MM-DD HH:mm:ss SSS");
+        const date = Internal.getFormatDate(Date.now());
         const todos: any[] = [];
 
         try {
-            const file = path.resolve(__dirname, "../static/todolist-table.json");
-            const table = JSON.parse(fs.readFileSync(file).toString());
+            const table = Internal.getTodoTable();
             table.list.forEach((item: any, index: number) => {
                 if (indexs.includes(index)) {
                     item.done = true;
@@ -223,8 +219,9 @@ namespace TODO {
                 }
             });
 
-            fs.writeFileSync(file, JSON.stringify(table, null, "    "));
             printer.printTable(todos);
+        
+            Internal.updateTodoTableToLocal(table);
         } catch (error) {
             console.trace(error);
         }
@@ -238,12 +235,12 @@ namespace TODO {
 
             readline.question("sure to clear all todo? y/n", (msg) => {
                 if (msg.toLowerCase() === "y") {
-                    const file = path.resolve(__dirname, "../static/todolist-table.json");
-                    const table = JSON.parse(fs.readFileSync(file).toString());
+                    const table = Internal.getTodoTable();
                     table.list = [];
 
-                    fs.writeFileSync(file, JSON.stringify(table, null, "    "));
                     printer.printTable([]);
+
+                    Internal.updateTodoTableToLocal(table);
                 }
                 else {
                     loger.logInfo(msg)
@@ -270,26 +267,75 @@ namespace TODO {
             if (option.variables) {
                 const varsArr: any[] = [];
                 for(let key in configer.vars){
-                    varsArr.push({ "var": key, description: configer.vars[key] });
+                    varsArr.push({ "var": key, description: configer.vars[key as Var] });
                 }
                 printer.printTable(varsArr);
             }
             else{
                 const configArr: any[] = [];
                 for (let key in configer.configs) {
-                    configArr.push({ "var": key, value: configer.configs[key] });
+                    configArr.push({ "var": key, value: configer.configs[key as Var] });
                 }
                 printer.printTable(configArr);
             }
         }
         // @ts-ignore
         export function actionSet(name: string, value: string, option: any, set: Command) {
-            if (!configer.vars[name]){
+            if (!configer.vars[name as Var]) {
                 loger.logErr("unsupport variable name:", name);
                 loger.logTip("see: 'todo conf list -v'");
             }
 
             configer.setConfig(name as any, value);
+        }
+    }
+
+    namespace Internal {
+        export function getTodoTable(): TODO_Table {
+            const author = configer.getConfig(Var.AUTHOR);
+            const authorPath = path.join(getAppData(), "Todos", author);
+            if (!fs.existsSync(authorPath)) {
+                fs.mkdirSync(authorPath, { recursive: true });
+            }
+            
+            const tableName = configer.getConfig(Var.TABLE);
+            const tableFile = path.join(authorPath, `todo_${tableName}_table.json`);
+            if (!fs.existsSync(tableFile)) {
+                return createTodoTable(tableName, configer.getConfig(Var.AUTHOR));
+            }
+
+            return JSON.parse(fs.readFileSync(tableFile).toString()) as TODO_Table;
+        }
+        export function updateTodoTableToLocal(table: TODO_Table) {
+            const todoPath = path.join(getAppData(), "Todos", table.author);
+            if (!fs.existsSync(todoPath)) {
+                fs.mkdirSync(todoPath, { recursive: true });
+            }
+
+            const tableFile = path.join(todoPath, `todo_${table.name}_table.json`);
+            fs.writeFileSync(tableFile, JSON.stringify(table, null, "  "));
+        }
+
+        export function getAppData(): string {
+            switch(os.platform()){
+                case "darwin":
+                    return path.join(os.homedir(), "/Library/Application Support");
+                case "win32":
+                    return path.join(os.homedir(), "/AppData/Roaming");
+                default:
+                    return os.homedir();
+            }
+        }
+        export function createTodoTable(name: string, author: string): TODO_Table {
+            return {
+                name,
+                author,
+                date: getFormatDate(Date.now()),
+                list: []
+            }
+        }
+        export function getFormatDate(date: number): string {
+            return dayjs(date).format("YYYY-MM-DD HH:mm:ss SSS")
         }
     }
 }

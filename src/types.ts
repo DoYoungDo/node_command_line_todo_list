@@ -1,6 +1,7 @@
 export * from "./loger";
 export * from "./printer";
 export * from "./configer";
+export * from "./displayer";
 
 export type TODO_Date = string;
 
@@ -19,9 +20,3 @@ export type TODO_Table = {
     list: TODO_Item[]
 }
 
-export type TODO_Display={
-    todo:string
-    done: "×" | "√"
-    create: TODO_Date
-    finished?: TODO_Date
-}

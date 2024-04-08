@@ -33,7 +33,6 @@ export class Configer {
 
     constructor(
         private _loger: Loger,
-        private _printer: Printer
     ) {
         this._CONFIG_PATH = path.join(os.homedir(), ".todo");
 

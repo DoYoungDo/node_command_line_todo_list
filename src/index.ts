@@ -4,7 +4,7 @@ import * as os from "os";
 import * as dayjs from "dayjs";
 import * as readLine from "readline";
 import { Command } from "commander";
-import { Configer, Loger, Printer, TODO_Item, TODO_Table, Var } from "./types";
+import { Configer, Displayer, Loger, Printer, TODO_Item, TODO_Table, Var } from "./types";
 
 namespace APP{
     export const NAME = "todo";
@@ -14,7 +14,8 @@ namespace APP{
 
 const loger: Loger = new Loger;
 const printer: Printer = new Printer;
-const configer: Configer = new Configer(loger, printer);
+const configer: Configer = new Configer(loger);
+const displayer: Displayer = new Displayer(printer);
 
 namespace TODO {
     export enum CommandName {
@@ -56,7 +57,7 @@ namespace TODO {
                 return item
             })
 
-            printer.printTable([...table.list.map((item: any) => { return {} }), ...todos]);
+            printer.printTable(displayer.displayTodoList(todos));
             
             table.list.push(...todos);
 
@@ -100,7 +101,7 @@ namespace TODO {
             const table = Internal.getTodoTable();
             const list = (table.list as any[]).filter((_, index) => !indexSet.has(index));
             table.list = list;
-            printer.printTable(table.list);
+            printer.printTable(displayer.displayTodoList(table.list));
 
             Internal.updateTodoTableToLocal(table);
         } catch (error) {
@@ -129,7 +130,7 @@ namespace TODO {
 
             const todos: any[] = new Array(index).fill({},0,index);
             todos.push(item);
-            printer.printTable(todos);
+            printer.printTable(displayer.displayTodoList(todos));
 
             Internal.updateTodoTableToLocal(table);
         } catch (error) {
@@ -168,7 +169,7 @@ namespace TODO {
                 return true;
             })
 
-            printer.printTable(list, ["index", "todo", "done", "begin", "end"]);
+            printer.printTable(displayer.displayTodoList(list));
         } catch (error) {
             console.trace(error);
         }
@@ -219,7 +220,7 @@ namespace TODO {
                 }
             });
 
-            printer.printTable(todos);
+            printer.printTable(displayer.displayTodoList(todos));
         
             Internal.updateTodoTableToLocal(table);
         } catch (error) {
@@ -284,6 +285,7 @@ namespace TODO {
             if (!configer.vars[name as Var]) {
                 loger.logErr("unsupport variable name:", name);
                 loger.logTip("see: 'todo conf list -v'");
+                return;
             }
 
             configer.setConfig(name as any, value);

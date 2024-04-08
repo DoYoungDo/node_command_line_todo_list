@@ -125,12 +125,10 @@ namespace TODO {
                 return;
             }
 
-            option.append ? item.todo += todo : item.todo = todo;
-            option.done ? item.done = option.done : void 0;
+            !!todo ? (option.append ? item.todo += todo : item.todo = todo) : void 0;
+            option.done ? item.done = Internal.optionDone(option) : void 0;
 
-            const todos: any[] = new Array(index).fill({},0,index);
-            todos.push(item);
-            printer.printTable(displayer.displayTodoList(todos));
+            printer.printTable(displayer.displayTodoList([item]));
 
             Internal.updateTodoTableToLocal(table);
         } catch (error) {
@@ -214,9 +212,6 @@ namespace TODO {
                     item.done = true;
                     item.end = date;
                     todos.push(item);
-                }
-                else {
-                    todos.push({});
                 }
             });
 
@@ -339,6 +334,15 @@ namespace TODO {
         export function getFormatDate(date: number): string {
             return dayjs(date).format("YYYY-MM-DD HH:mm:ss SSS")
         }
+        export function optionDone(options: any): boolean {
+            if (options.done) {
+                if(/false/.test(options.done)){
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }
 
@@ -365,9 +369,9 @@ namespace TODO {
     app.command(TODO.CommandName.MOD)
         .description("修改 待办项")
         .argument("<index>", "索引序号")
-        .argument("<todo>", "待办内容")
-        .option("-a --append", "在原内容上追加", false)
-        .option("-d --done", "修改为完成", false)
+        .argument("[todo]", "待办内容")
+        .option("-a --append", "在原内容上追加，指定参数todo后生效", false)
+        .option("-d --done [done[true|false]]", "修改为完成")
         .action(TODO.actionModify)
 
     app.command(TODO.CommandName.LIST)

@@ -352,20 +352,20 @@ namespace TODO {
     app.command(TODO.CommandName.ADD)
         .description("添加 待办项")
         .argument("<todo...>", "待办项")
-        .option("-d --done", "完成", false)
+        .option("-d --done", "添加时完成", false)
         .action(TODO.actionAdd)
 
     app.command(TODO.CommandName.RM)
         .description("删除 待办项")
-        .argument("<index...>", "序号")
+        .argument("<index...>", "索引序号")
         .action(TODO.actionRemove);
 
     app.command(TODO.CommandName.MOD)
         .description("修改 待办项")
-        .argument("<index>", "序号")
+        .argument("<index>", "索引序号")
         .argument("<todo>", "待办内容")
-        .option("-a --append", "追加", false)
-        .option("-d --done", "完成", false)
+        .option("-a --append", "在原内容上追加", false)
+        .option("-d --done", "修改为完成", false)
         .action(TODO.actionModify)
 
     app.command(TODO.CommandName.LIST)
@@ -384,7 +384,7 @@ namespace TODO {
 
     app.command(TODO.CommandName.DONE)
         .description("完成 待办项")
-        .argument("<index...>", "序号")
+        .argument("<index...>", "索引序号")
         .action(TODO.actionDone)
 
     app.command(TODO.CommandName.CLEAR)

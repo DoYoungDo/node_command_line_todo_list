@@ -5,15 +5,32 @@ node js 命令行待办
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```bash
+npm i
+```
+---
+
+```bash
+npm run build
+```
+--- 
+
+```bash
+node out/index.js -h
+```
+ 
+or 
+
+```bash
+alias todo='node out/index.js'
+```
+
+```bash
+todo -h
+```
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
 
 #### 参与贡献
 

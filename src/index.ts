@@ -99,7 +99,7 @@ namespace TODO {
         // const indexs: number[] = args.map(arg => Number.parseInt(arg)).filter(num => !isNaN(num));
         try {
             const table = Internal.getTodoTable();
-            const list = (table.list as any[]).filter((_, index) => !indexSet.has(index));
+            const list = (table.list as any[]).filter((item) => !indexSet.has(item.index)).map((item, index) => { item.index = index; return item });
             table.list = list;
             printer.printTable(displayer.displayTodoList(table.list));
 

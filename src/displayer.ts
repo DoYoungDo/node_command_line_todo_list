@@ -28,9 +28,9 @@ export class Displayer{
    
     private createDisplayTodoItem(index: any, todo: any, done: any, begin: any, end: any): any {
         return {
+            "状态": done,
             "索引": index,
             "待办": todo,
-            "状态": done,
             "创建时间": begin,
             "完成时间": end
         }

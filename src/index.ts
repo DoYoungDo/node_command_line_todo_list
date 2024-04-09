@@ -26,6 +26,7 @@ namespace TODO {
         LIST = "list",
         DONE = "done",
         CLEAR = "clear",
+        RISE = "rise",
         CONF = "conf"
     }
 
@@ -249,6 +250,47 @@ namespace TODO {
             console.trace(error);
         }  
     }
+    export function actionRise(arg0: string, arg1: string[], option: any) {
+        try {
+            if (!Internal.checkNumber(arg0, true)) {
+                return;
+            }
+            const count = Number.parseInt(arg0);
+            if(count <= 0){
+                loger.logWarn("invalid count, count must > 0");
+                return;
+            }
+
+            const indexs = arg1.filter(arg => Internal.checkNumber(arg, false)).map(item => Number.parseInt(item));
+            if(!indexs.length){
+                loger.logErr("got no valid index");
+                return;
+            }
+
+            const table = Internal.getTodoTable();
+            let list = table.list;
+            for(let index of indexs){
+                if (index < 0) {
+                    continue;
+                }
+                
+                const item = list.find(item => item.index === index)!;
+                const listWithoutIndexItem = list.filter(item => item.index !== index);
+
+                const targetIndex = option.down ? (index + count) : ((index - count) < 0 ? 0 : index - count);
+                list = listWithoutIndexItem.slice(0, targetIndex).concat([item]).concat(listWithoutIndexItem.slice(targetIndex));
+            }
+            
+            table.list = list.map((item, index) => { item.index = index; return item; });
+
+            printer.printTable(displayer.displayTodoList(table.list));
+
+            Internal.updateTodoTableToLocal(table);
+        } catch (error) {
+            console.trace(error);
+        }
+        
+    }
     export function actionConfig(option: any, conf: Command) {
         const list = conf.commands.find((c: Command) => c.name() === Config.CommandName.LIST);
         list?.parse();
@@ -343,6 +385,15 @@ namespace TODO {
             }
             return false;
         }
+        export function checkNumber(num: string, logerr: boolean = false): boolean {
+            if (!/^(\d+)$/.test(num)) {
+                if(logerr){
+                    loger.logErr("not a number:", num);
+                }
+                return false;
+            }
+            return true
+        }
     }
 }
 
@@ -396,6 +447,13 @@ namespace TODO {
     app.command(TODO.CommandName.CLEAR)
         .description("清空 待办项")
         .action(TODO.actionClear)
+
+    app.command(TODO.CommandName.RISE)
+        .description("提升 待办项")
+        .argument("<count>", "提升数量")
+        .argument("<index...>", "索引序号")
+        .option("-d --down", "反射提升")
+        .action(TODO.actionRise)
 
     const configCommand = app.command(TODO.CommandName.CONF)
         .description("配置")

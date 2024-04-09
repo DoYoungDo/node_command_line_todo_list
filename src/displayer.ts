@@ -14,7 +14,9 @@ export class Displayer{
             return this.createDisplayTodoItem(
                 todo.index,
                 todo.todo,
-                todo.done ? "√" : "×",
+                todo.done ? "✅" : "❌",
+                // todo.done ? "✅" : "❎",
+                // todo.done ? "√" : "×",
                 todo.begin,
                 todo.end ?? "-"
             )

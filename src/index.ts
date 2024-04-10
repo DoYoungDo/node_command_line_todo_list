@@ -301,7 +301,13 @@ namespace TODO {
             SET = "set"
         }
         // @ts-ignore
-        export function actionList(option: any) {
+        export function actionList(arg: string, option: any) {
+            if (arg && !!configer.vars[arg as Var]) {
+                const history = configer.getHistory(arg as Var);
+                printer.printTable(history);
+                return;
+            }
+            
             if (option.variables) {
                 const varsArr: any[] = [];
                 for(let key in configer.vars){
@@ -461,6 +467,7 @@ namespace TODO {
 
     configCommand.command(TODO.Config.CommandName.LIST)
         .description("配置列表")
+        .argument("[variable]", "变量名称")
         .option("-v --variables", "显示所有支持的变量", false)
         .action(TODO.Config.actionList);
 

@@ -1,6 +1,6 @@
 export class Printer {
 
-    printTable(tabularData: any, properties?: readonly string[],showIndex:boolean = true):void {
+    printTable(tabularData: any[], properties?: readonly string[],showIndex:boolean = true):void {
         console.table(tabularData, properties);
     }
 

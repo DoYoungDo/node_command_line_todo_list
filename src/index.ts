@@ -127,7 +127,11 @@ namespace TODO {
             }
 
             !!todo ? (option.append ? item.todo += todo : item.todo = todo) : void 0;
-            option.done ? item.done = Internal.optionDone(option) : void 0;
+            if(option.done){
+                const done = Internal.optionDone(option);
+                item.done = done;
+                item.end = done ? Internal.getFormatDate(Date.now()) : "-"
+            }
 
             printer.printTable(displayer.displayTodoList([item]));
 

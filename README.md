@@ -97,7 +97,7 @@ $ todo mod 1 111 -a
 # 将索引为1的待办状态修改为完成
 $ todo mod 1 -d
 
-# 将索引为1的待办状态修改为示完成
+# 将索引为1的待办状态修改为未完成
 $ todo mod 1 -d false
 
 # 显示当前`table`的所有待办
@@ -106,7 +106,7 @@ $ todo list
 # 显示当前`table`的所有已经完成的待办
 $ todo list -d 
 
-# 显示当前`table`的未已经完成的待办
+# 显示当前`table`的所有未完成的待办
 $ todo list -d false
 
 # 显示当前`table`索引从3开始的所有待办

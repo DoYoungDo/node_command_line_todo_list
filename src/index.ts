@@ -27,6 +27,7 @@ namespace TODO {
         DONE = "done",
         CLEAR = "clear",
         RISE = "rise",
+        FIND = "find",
         CONF = "conf"
     }
 
@@ -295,6 +296,30 @@ namespace TODO {
         }
         
     }
+    export function actionFind(arg0: string[], option: any) {
+        const filters = option.caseSensitive ? arg0 : arg0.map(arg => arg.toLowerCase());
+        const table = Internal.getTodoTable();
+
+        const list = table.list.filter(item => {
+            let todo = option.caseSensitive ? item.todo : item.todo.toLowerCase();
+            if(option.single){
+                return !!filters.find(filter => (todo).includes(filter));
+            }
+            else{
+                let find = false;
+                filters.forEach(filter=>{
+                    find = todo.includes(filter);
+                })
+                return find;
+            }
+        })
+        if(!list.length){
+            printer.printLine(`can not find todo about contain: ${arg0}`)
+            return;
+        }
+
+        printer.printTable(displayer.displayTodoList(list));
+    }
     export function actionConfig(option: any, conf: Command) {
         const list = conf.commands.find((c: Command) => c.name() === Config.CommandName.LIST);
         list?.parse();
@@ -464,6 +489,13 @@ namespace TODO {
         .argument("<index...>", "索引序号")
         .option("-d --down", "反射提升")
         .action(TODO.actionRise)
+    
+    app.command(TODO.CommandName.FIND)
+        .description("查找 待办项")
+        .argument("<todo...>", "查找内容")
+        .option("-c --caseSensitive", "区分大小写", false)
+        .option("-s --single", "匹配单个条件", false)
+        .action(TODO.actionFind)
 
     const configCommand = app.command(TODO.CommandName.CONF)
         .description("配置")

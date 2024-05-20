@@ -6,6 +6,9 @@
 	"version": "1.0.0",
 	"publisher": "doyoung",
 	"main": "./out/index.js",
+	"bin": {
+		"todo": "./out/index.js"
+	},
 	"scripts": {
 		"watch": "npm run clean && tsc -b -w",
 		"build": "gulp build",

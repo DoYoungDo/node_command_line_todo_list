@@ -14,11 +14,6 @@ module.exports = {
 		devtoolModuleFilenameTemplate: "../[resource-path]"
 	},
 	devtool: 'source-map',
-	externals: {
-		hbuilderx: 'commonjs hbuilderx',
-		vscode: 'commonjs vscode',
-		hxnls: 'commonjs hxnls'
-	},
 	resolve: {
 		extensions: ['.ts', '.js'],
 	},

@@ -6,27 +6,15 @@ node js 命令行待办
 #### 安装教程
 
 ```bash
-npm i
-```
----
+$ npm i
 
-```bash
-npm run build
-```
---- 
+$ npm run build
 
-```bash
-node out/index.js -h
-```
- 
-or 
+$ npm i . -g
 
-```bash
-alias todo='node out/index.js'
-```
+$ source ~/.bash_profile
 
-```bash
-todo -h
+$ todo -h
 ```
 
 #### 使用说明

@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
@@ -306,11 +308,13 @@ namespace TODO {
                 return !!filters.find(filter => (todo).includes(filter));
             }
             else{
-                let find = false;
-                filters.forEach(filter=>{
-                    find = todo.includes(filter);
-                })
-                return find;
+                return !filters.find(filter => !(todo).includes(filter));
+            //     for(let filter of filters){
+            //         if (!todo.includes(filter)){
+            //             return false
+            //         }
+            //     }
+            //     return true;
             }
         })
         if(!list.length){

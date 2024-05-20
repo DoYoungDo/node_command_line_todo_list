@@ -7,12 +7,7 @@ import * as dayjs from "dayjs";
 import * as readLine from "readline";
 import { Command } from "commander";
 import { Configer, Displayer, Loger, Printer, TODO_Item, TODO_Table, Var } from "./types";
-
-namespace APP{
-    export const NAME = "todo";
-    export const VRESION = "0.1.0";
-    export const DESCRIPTION = "待办项";
-}
+import { AddCommand, ClearCommand, CommandManager, ConfigCommand, DoneCommand, FindCommand, ListCommand, ModifyCommand, RemoveCommand, RiseCommand } from "./command_manager";
 
 const loger: Loger = new Loger;
 const printer: Printer = new Printer;
@@ -31,19 +26,6 @@ namespace TODO {
         RISE = "rise",
         FIND = "find",
         CONF = "conf"
-    }
-
-    export function actionTodo(args: string[], options: any, todo: Command) {
-        void (options);
-
-        if (!args.length) {
-            const list = todo.commands.find((c: Command) => c.name() === CommandName.LIST);
-            list?.parse();
-        }
-        else {
-            const add = todo.commands.find((c: Command) => c.name() === CommandName.ADD);
-            add?.parse([CommandName.TODO, CommandName.ADD, ...args]);
-        }
     }
     export function actionAdd(args: string[], options: any, add: Command) {
         try {
@@ -436,86 +418,20 @@ namespace TODO {
     }
 }
 
-(function main(argc: number, argv: any) {
-    const app: Command = new Command;
+function initCommand(): CommandManager {
+    const CMD_MNGR = new CommandManager(process.argv);
+    CMD_MNGR.registerCommand(new AddCommand);
+    CMD_MNGR.registerCommand(new RemoveCommand);
+    CMD_MNGR.registerCommand(new ModifyCommand);
+    CMD_MNGR.registerCommand(new ListCommand(configer, printer, displayer));
+    CMD_MNGR.registerCommand(new DoneCommand);
+    CMD_MNGR.registerCommand(new ClearCommand);
+    CMD_MNGR.registerCommand(new RiseCommand);
+    CMD_MNGR.registerCommand(new FindCommand);
+    CMD_MNGR.registerCommand(new ConfigCommand);
+    return CMD_MNGR;
+}
 
-    app.name(APP.NAME)
-        .version(APP.VRESION)
-        .description(APP.DESCRIPTION)
-        .argument("[todo...]", "添加 待办项")
-        .action(TODO.actionTodo)
-
-    app.command(TODO.CommandName.ADD)
-        .description("添加 待办项")
-        .argument("<todo...>", "待办项")
-        .option("-d --done", "添加时完成", false)
-        .action(TODO.actionAdd)
-
-    app.command(TODO.CommandName.RM)
-        .description("删除 待办项")
-        .argument("<index...>", "索引序号")
-        .action(TODO.actionRemove);
-
-    app.command(TODO.CommandName.MOD)
-        .description("修改 待办项")
-        .argument("<index>", "索引序号")
-        .argument("[todo]", "待办内容")
-        .option("-a --append", "在原内容上追加，指定参数todo后生效", false)
-        .option("-d --done [done[true|false]]", "修改为完成")
-        .action(TODO.actionModify)
-
-    app.command(TODO.CommandName.LIST)
-        .description("显示 待办项")
-        .argument("[range]", ["显示范围",
-            "起始：[start | [start-，结束缺省:max",
-            "结束：end]，起始缺省：0",
-            "起始-结束：[start-end] | start-end",
-            "例：",
-            "查看起始位置为12的：[12 或 [12- ",
-            "查看起始位置为12结束位置为14的：12-14 或 [12-14]",
-            "查看起始位置为0结束位置为14的：14],14] = [0-14] = 0-14"].join("\n"))
-        .option("-d --done [done[true|false]]", "只显示完成的")
-        .option("-c --count", "显示数量", false)
-        .action(TODO.actionList);
-
-    app.command(TODO.CommandName.DONE)
-        .description("完成 待办项")
-        .argument("<index...>", "索引序号")
-        .action(TODO.actionDone)
-
-    app.command(TODO.CommandName.CLEAR)
-        .description("清空 待办项")
-        .action(TODO.actionClear)
-
-    app.command(TODO.CommandName.RISE)
-        .description("提升 待办项")
-        .argument("<count>", "提升数量")
-        .argument("<index...>", "索引序号")
-        .option("-d --down", "反射提升")
-        .action(TODO.actionRise)
-    
-    app.command(TODO.CommandName.FIND)
-        .description("查找 待办项")
-        .argument("<todo...>", "查找内容")
-        .option("-c --caseSensitive", "区分大小写", false)
-        .option("-s --single", "匹配单个条件", false)
-        .action(TODO.actionFind)
-
-    const configCommand = app.command(TODO.CommandName.CONF)
-        .description("配置")
-        .action(TODO.actionConfig)
-
-    configCommand.command(TODO.Config.CommandName.LIST)
-        .description("配置列表")
-        .argument("[variable]", "变量名称")
-        .option("-v --variables", "显示所有支持的变量", false)
-        .action(TODO.Config.actionList);
-
-    configCommand.command(TODO.Config.CommandName.SET)
-        .description("修改配置")
-        .argument("<var>", "变量名称")
-        .argument("<value>", "变量值")
-        .action(TODO.Config.actionSet);
-
-    app.parse(argv);
-})(process.argv.length, process.argv);
+(function main() {
+    initCommand().run();
+})();

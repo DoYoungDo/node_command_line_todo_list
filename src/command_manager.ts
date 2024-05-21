@@ -30,6 +30,7 @@ export class AppCommand extends BuiltinCommandBase{
         this.name(this.NAME)
         .version(this.VERSION)
         .description(this.DESCRIPTION)
+        .argument("[todo...]", "添加 待办项")
         .action(this.actionImp)
     }
 

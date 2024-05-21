@@ -22,4 +22,14 @@ export class Todo{
 
         return JSON.parse(fs.readFileSync(tableFile).toString()) as TODO_Table;
     }
+
+    setTable(table: TODO_Table): void {
+        const todoPath = path.join(getAppData(), "Todos", table.author);
+        if (!fs.existsSync(todoPath)) {
+            fs.mkdirSync(todoPath, { recursive: true });
+        }
+
+        const tableFile = path.join(todoPath, `todo_${table.name}_table.json`);
+        fs.writeFileSync(tableFile, JSON.stringify(table, null, "  "));
+    }
 }

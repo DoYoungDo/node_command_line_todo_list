@@ -1,8 +1,12 @@
 import { Command } from "commander";
-import { Configer, Displayer, Loger, Printer, TODO_Item, TODO_Table, Var } from "./types";
+import { TODO_Item, TODO_Table } from "./types";
 import { Todo } from "./todo";
 import { checkNumber, getFormatDate } from "./utils";
 import * as readLine from "readline";
+import { Printer } from "./printer";
+import { Displayer } from "./displayer";
+import { Configer, Var } from "./configer";
+import { Loger } from "./loger";
 
 enum BuiltInCommand {
     ADD = "add",

@@ -1,7 +1,8 @@
 import * as dayjs from "dayjs";
 import * as os from "os";
 import * as path from "path";
-import { Loger, TODO_Table } from "./types";
+import { TODO_Table } from "./types";
+import { Loger } from "./loger";
 
 export function getAppData(): string {
     switch(os.platform()){

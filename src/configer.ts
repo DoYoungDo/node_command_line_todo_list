@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as path from "path";
 import * as fs from "fs";
-import { Loger, Printer } from "./types";
+import { Loger } from "./loger";
 
 type VarName = Var;
 type Value = string;

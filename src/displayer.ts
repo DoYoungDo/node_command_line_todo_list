@@ -1,4 +1,5 @@
-import { Printer, TODO_Item } from "./types";
+import { Printer } from "./printer";
+import { TODO_Item } from "./types";
 
 export class Displayer{
     constructor(

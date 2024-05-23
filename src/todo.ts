@@ -1,7 +1,8 @@
 import * as path from "path";
 import * as fs from "fs";
-import { Configer, TODO_Table, Var } from "./types";
+import { TODO_Table } from "./types";
 import { createTodoTable, getAppData } from "./utils";
+import { Configer, Var } from "./configer";
 
 export class Todo{
     constructor(private _configer:Configer) {

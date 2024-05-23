@@ -3,29 +3,25 @@ import * as path from "path";
 import * as fs from "fs";
 import { Loger } from "./loger";
 
-type VarName = Var;
-type Value = string;
-type Description = string;
+export enum BuiltinConfigVariable {
+    TABLE = "table",
+    AUTHOR = "author"
+}
 
-const VARIABLES_INFO: Record<VarName, Description> = {
+export const BuiltinConfigVariableDescription: Record<BuiltinConfigVariable, string> = {
     table: "表",
     author: "作者"
 }
 
-type LocalConfig = Record<VarName, Value>;
+type LocalConfig = Record<BuiltinConfigVariable, string>;
 const DEFAULT_CONFIG: LocalConfig = {
     table: "default",
     author: "default"
 }
 
-export enum Var {
-    TABLE = "table",
-    AUTHOR = "author"
-}
-
-const HISTORY: Record<string, string[]> = {
-    table_list: ["default"],
-    author_list: ["default"]
+const DEFAULT_HISTORY: Record<BuiltinConfigVariable, string[]> = {
+    table: ["default"],
+    author: ["default"]
 }
 
 export class Configer {
@@ -33,7 +29,7 @@ export class Configer {
     private readonly _CONFIG_TODO_PATH: string;
     private readonly _CONFIG_HISTORY_PATH: string;
     private _configs: LocalConfig = DEFAULT_CONFIG;
-    private _history = HISTORY;
+    private _history = DEFAULT_HISTORY;
 
     constructor(
         private _loger: Loger,
@@ -45,31 +41,26 @@ export class Configer {
         this.checkLocal();
     }
 
-    get vars(): Record<Var, Description> {
-        return VARIABLES_INFO;
-    }
-
     get configs(): LocalConfig {
         return this._configs;
     }
 
-    setConfig(key: VarName, value: Value) {
+    setConfig(key: BuiltinConfigVariable, value: string) {
         this._configs[key] = value;
         this.syncConfigToLocal();
 
-        const keyList = `${key}_list`;
-        if (this._history[keyList] && !this._history[keyList].includes(value)) {
-            this._history[keyList].push(value);
+        if (this._history[key] && !this._history[key].includes(value)) {
+            this._history[key].push(value);
             this.syncHistoryToLocal();
         }
     }
 
-    getConfig(key: VarName): Value {
+    getConfig(key: BuiltinConfigVariable): string {
         return this._configs[key];
     }
 
-    getHistory(key: VarName): Value[] {
-        return this._history[`${key}_list`] ?? [];
+    getHistory(key: BuiltinConfigVariable): string[] {
+        return this._history[key] ?? [];
     }
     
     private checkLocal(){

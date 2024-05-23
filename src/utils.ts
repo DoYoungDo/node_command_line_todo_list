@@ -3,6 +3,7 @@ import * as os from "os";
 import * as path from "path";
 import { TODO_Table } from "./types";
 import { Loger } from "./loger";
+import { BuiltinConfigVariable } from "./configer";
 
 export function getAppData(): string {
     switch(os.platform()){
@@ -35,4 +36,7 @@ export function checkNumber(num: string, loger?: Loger): boolean {
         return false;
     }
     return true
+}
+export function isBuiltinVariable(mayVar: string): boolean {
+    return !!Object.keys(BuiltinConfigVariable).find(key => key === mayVar);
 }

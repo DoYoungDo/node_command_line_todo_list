@@ -1,11 +1,11 @@
 import { Command } from "commander";
 import { TODO_Item, TODO_Table } from "./types";
 import { Todo } from "./todo";
-import { checkNumber, getFormatDate } from "./utils";
+import { checkNumber, getFormatDate, isBuiltinVariable } from "./utils";
 import * as readLine from "readline";
 import { Printer } from "./printer";
 import { Displayer } from "./displayer";
-import { Configer, Var } from "./configer";
+import { BuiltinConfigVariable, BuiltinConfigVariableDescription, Configer } from "./configer";
 import { Loger } from "./loger";
 
 enum BuiltInCommand {
@@ -521,23 +521,23 @@ export namespace ConfigCommand{
         }
 
         actionImp(arg: string, option: any): void {
-            if (arg && !!this._configer.vars[arg as Var]) {
-                const history = this._configer.getHistory(arg as Var);
+            if (arg && !!isBuiltinVariable(arg)) {
+                const history = this._configer.getHistory(arg as BuiltinConfigVariable);
                 this._printer.printTable(history);
                 return;
             }
             
             if (option.variables) {
                 const varsArr: any[] = [];
-                for (let key in this._configer.vars) {
-                    varsArr.push({ "var": key, description: this._configer.vars[key as Var] });
+                for (let key in Object.keys(BuiltinConfigVariable)) {
+                    varsArr.push({ "var": key, description: BuiltinConfigVariableDescription[key as BuiltinConfigVariable] });
                 }
                 this._printer.printTable(varsArr);
             }
             else{
                 const configArr: any[] = [];
                 for (let key in this._configer.configs) {
-                    configArr.push({ "var": key, value: this._configer.configs[key as Var] });
+                    configArr.push({ "var": key, value: this._configer.configs[key as BuiltinConfigVariable] });
                 }
                 this._printer.printTable(configArr);
             }
@@ -559,7 +559,7 @@ export namespace ConfigCommand{
         }
 
         actionImp(name: string, value: string, option: any): void {
-            if (!this._configer.vars[name as Var]) {
+            if (!isBuiltinVariable(name)) {
                 this._loger.logErr("unsupport variable name:", name);
                 this._loger.logTip("see: 'todo conf list -v'");
                 return;

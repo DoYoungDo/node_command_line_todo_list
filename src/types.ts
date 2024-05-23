@@ -15,3 +15,10 @@ export type TODO_Table = {
     list: TODO_Item[]
 }
 
+export type Config_History = {
+    [key: string]: string[]
+}
+
+export type Config_Current = {
+    [key: string]: string
+}

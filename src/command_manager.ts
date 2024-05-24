@@ -521,6 +521,7 @@ export namespace ConfigCommand{
         }
 
         actionImp(arg: string, option: any): void {
+            // console.log(this.args);
             if (arg && !!isBuiltinVariable(arg)) {
                 const history = this._configer.getHistory(arg as BuiltinConfigVariable);
                 this._printer.printTable(history);
@@ -529,7 +530,7 @@ export namespace ConfigCommand{
             
             if (option.variables) {
                 const varsArr: any[] = [];
-                for (let key in Object.keys(BuiltinConfigVariable)) {
+                for (let key in Object.values(BuiltinConfigVariable)) {
                     varsArr.push({ "var": key, description: BuiltinConfigVariableDescription[key as BuiltinConfigVariable] });
                 }
                 this._printer.printTable(varsArr);

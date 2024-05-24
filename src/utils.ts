@@ -38,5 +38,5 @@ export function checkNumber(num: string, loger?: Loger): boolean {
     return true
 }
 export function isBuiltinVariable(mayVar: string): boolean {
-    return !!Object.keys(BuiltinConfigVariable).find(key => key === mayVar);
+    return !!Object.values(BuiltinConfigVariable).find(key => key === mayVar);
 }

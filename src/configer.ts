@@ -47,6 +47,10 @@ export class Configer {
 
     setConfig(key: BuiltinConfigVariable, value: string) {
         this._configs[key] = value;
+        if(key === BuiltinConfigVariable.AUTHOR){
+            this._configs[BuiltinConfigVariable.TABLE] = DEFAULT_CONFIG.table;
+        }
+
         this.syncConfigToLocal();
 
         if (this._history[key] && !this._history[key].includes(value)) {

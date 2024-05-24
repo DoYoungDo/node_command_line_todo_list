@@ -2,6 +2,8 @@ import * as os from "os";
 import * as path from "path";
 import * as fs from "fs";
 import { Loger } from "./loger";
+import { File } from "./utils";
+import { assert } from "console";
 
 export enum BuiltinConfigVariable {
     TABLE = "table",
@@ -30,13 +32,15 @@ export class Configer {
     private readonly _CONFIG_HISTORY_PATH: string;
     private _configs: LocalConfig = DEFAULT_CONFIG;
     private _history = DEFAULT_HISTORY;
-
+    private _backup: File;
     constructor(
         private _loger: Loger,
     ) {
         this._CONFIG_DIR= path.join(os.homedir(), ".todo");
         this._CONFIG_TODO_PATH = path.join(this._CONFIG_DIR, ".todo");
         this._CONFIG_HISTORY_PATH = path.join(this._CONFIG_DIR, ".history");
+
+        this._backup = new File(path.join(this._CONFIG_DIR, ".backup"));
 
         this.checkLocal();
     }
@@ -80,6 +84,10 @@ export class Configer {
         if (fs.existsSync(this._CONFIG_HISTORY_PATH)) {
             const data = JSON.parse(fs.readFileSync(this._CONFIG_HISTORY_PATH).toString());
             this._history = data;
+        }
+
+        if(!this._backup.valid){
+            assert(this._backup.create({}).valid, "create backup file failed...");
         }
     }
 

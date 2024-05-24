@@ -1,4 +1,5 @@
 import * as dayjs from "dayjs";
+import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { TODO_Table } from "./types";
@@ -15,7 +16,6 @@ export function getAppData(): string {
             return os.homedir();
     }
 }
-
 export function createTodoTable(name: string, author: string): TODO_Table {
     return {
         name,
@@ -24,7 +24,6 @@ export function createTodoTable(name: string, author: string): TODO_Table {
         list: []
     }
 }
-
 export function getFormatDate(date: number): string {
     return dayjs(date).format("YYYY-MM-DD HH:mm:ss SSS")
 }
@@ -39,4 +38,34 @@ export function checkNumber(num: string, loger?: Loger): boolean {
 }
 export function isBuiltinVariable(mayVar: string): boolean {
     return !!Object.values(BuiltinConfigVariable).find(key => key === mayVar);
+}
+
+export class File<S extends object = {}> {
+    constructor(private _filePath: string) {}
+    create(data: S): this {
+        if (!fs.existsSync(this._filePath)) {
+            const dir = path.dirname(this._filePath);
+            if(!fs.existsSync(dir)){
+                fs.mkdirSync(dir, { recursive: true })
+            }
+            fs.writeFileSync(this._filePath, JSON.stringify(data, null, "    "));
+        }
+        return this;
+    }
+
+    get valid():boolean{
+        return fs.existsSync(this._filePath);
+    }
+
+    read():S{
+        try {
+            return JSON.parse(fs.readFileSync(this._filePath).toString()) as S;
+        } catch (error) {
+            return {} as S;
+        }
+    }
+
+    write(data:S){
+        fs.writeFileSync(this._filePath, JSON.stringify(data, null, "    "));
+    }
 }

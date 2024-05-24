@@ -3,7 +3,7 @@
 	"name": "node-js-command-line-todo-list",
 	"description": "node js command line todo list",
 	"displayName": "node-js-command-line-todo-list",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "doyoung",
 	"main": "./out/index.js",
 	"bin": {

@@ -26,7 +26,7 @@ abstract class BuiltinCommandBase extends Command{
 
 export class AppCommand extends BuiltinCommandBase{
     private readonly NAME = "todo";
-    private readonly VERSION = "0.1.0";
+    private readonly VERSION = "1.0.1";
     private readonly DESCRIPTION = "待办项";
 
     constructor() {
@@ -530,7 +530,7 @@ export namespace ConfigCommand{
             
             if (option.variables) {
                 const varsArr: any[] = [];
-                for (let key in Object.values(BuiltinConfigVariable)) {
+                for (let key of Object.values(BuiltinConfigVariable)) {
                     varsArr.push({ "var": key, description: BuiltinConfigVariableDescription[key as BuiltinConfigVariable] });
                 }
                 this._printer.printTable(varsArr);

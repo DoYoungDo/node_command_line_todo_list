@@ -458,23 +458,28 @@ export class FindCommand extends BuiltinCommandBase {
             .argument("<todo...>", "查找内容")
             .option("-c --caseSensitive", "区分大小写", false)
             .option("-s --single", "匹配单个条件", false)
+            .option("-d --done [true|false]", "匹配完成待办")
             .action(this.actionImp);
     }
 
     actionImp(arg0: string[], option: any): void {
         const todoModle = new Todo(this._configer);
         const filters = option.caseSensitive ? arg0 : arg0.map(arg => arg.toLowerCase());
+        const done = option.done === undefined ? undefined : (/false/.test(option.done) ? false : true);
+
         const table = todoModle.getTable();
 
-        const list = table.list.filter(item => {
-            let todo = option.caseSensitive ? item.todo : item.todo.toLowerCase();
-            if (option.single) {
-                return !!filters.find(filter => (todo).includes(filter));
-            }
-            else {
-                return !filters.find(filter => !(todo).includes(filter));
-           }
-        })
+        let list = table.list.filter(done === undefined ? item => item : item => item.done === done)
+            .filter(item => {
+                let todo = option.caseSensitive ? item.todo : item.todo.toLowerCase();
+                if (option.single) {
+                    return !!filters.find(filter => (todo).includes(filter));
+                }
+                else {
+                    return !filters.find(filter => !(todo).includes(filter));
+                }
+            })
+
         if (!list.length) {
             this._printer.printLine(`can not find todo about contain: ${arg0}`)
             return;

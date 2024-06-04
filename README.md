@@ -24,7 +24,7 @@ $ todo -h
 
 #### 使用说明
 
-**查看帮助**
+<span style="color: chartreuse;">**查看帮助**</span>
 
 ```bash
 todo -h
@@ -32,7 +32,7 @@ todo -h
 
 ![](README_files/1.jpg)
 
-**查看版本**
+<span style="color: chartreuse;">**查看版本**</span>
 
 ```bash
 todo -V
@@ -40,7 +40,7 @@ todo -V
 
 ![](README_files/2.jpg)
 
-**添加待办**
+<span style="color: chartreuse;">**添加待办**</span>
 
 ```bash
 todo 1
@@ -54,7 +54,7 @@ todo add 2
 
 ![](README_files/4.jpg)
 
-**批量添加待办**
+<span style="color: chartreuse;">**批量添加待办**</span>
 
 ```bash
 todo 3 4 5
@@ -68,7 +68,7 @@ todo add 6 7 8
 
 ![](README_files/6.jpg)
 
-**添加待办时设置完成**
+<span style="color: chartreuse;">**添加待办时设置完成**</span>
 
 ```bash
 todo add 9 -d
@@ -76,7 +76,7 @@ todo add 9 -d
 
 ![](README_files/7.jpg)
 
-**移除待办项**
+<span style="color: chartreuse;">**移除待办项**</span>
 
 ```bash
 todo rm 8
@@ -84,7 +84,7 @@ todo rm 8
 
 ![](README_files/8.jpg)
 
-**批量移除待办项**
+<span style="color: chartreuse;">**批量移除待办项**</span>
 
 ```bash
 todo rm 7 6 5 4 3 2 1 0
@@ -100,7 +100,7 @@ todo rm 8 4 7 3 6 2 5 0 1
 
 > 索引顺序不敏感
 
-**修改待办内容**
+<span style="color: chartreuse;">**修改待办内容**</span>
 
 ```bash
 todo mod 0 after
@@ -114,7 +114,7 @@ todo mod 0 after
 
 ![](README_files/12.jpg)
 
-**待办内容后追加**
+<span style="color: chartreuse;">**待办内容后追加**</span>
 
 ```bash
 todo mod 0 \ append -a
@@ -128,7 +128,7 @@ todo mod 0 \ append -a
 
 ![](README_files/14.jpg)
 
-**修改待办状态为完成**
+<span style="color: chartreuse;">**修改待办状态为完成**</span>
 
 ```bash
 todo mod 0 -d true
@@ -142,7 +142,7 @@ todo done 0
 
 ![](README_files/16.jpg)
 
-**查看所有待办**
+<span style="color: chartreuse;">**查看所有待办**</span>
 
 ```bash
 todo
@@ -156,7 +156,7 @@ todo list
 
 ![](README_files/18.jpg)
 
-**查看所有已完成的待办**
+<span style="color: chartreuse;">**查看所有已完成的待办**</span>
 
 ```bash
 todo list -d
@@ -170,11 +170,11 @@ todo list -d true
 
 ![](README_files/20.jpg)
 
-**查看所有未完成的待办**
+<span style="color: chartreuse;">**查看所有未完成的待办**</span>
 
 ![](README_files/21.jpg)
 
-**查看前五个待办**
+<span style="color: chartreuse;">**查看前五个待办**</span>
 
 ```bash
 todo list 5]
@@ -182,7 +182,7 @@ todo list 5]
 
 ![](README_files/22.jpg)
 
-**查看第五个之后的待办**
+<span style="color: chartreuse;">**查看第五个之后的待办**</span>
 
 ```bash
 todo list 5

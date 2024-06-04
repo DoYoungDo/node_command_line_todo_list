@@ -24,119 +24,169 @@ $ todo -h
 
 #### 使用说明
 
-示例：
-
-- 直接跟参数
+**查看帮助**
 
 ```bash
-# 一次添加三个待办
-$ todo 123 321 123456
-
-┌─────────┬──────┬──────┬───────────┬───────────────────────────┬──────────┐
-│ (index) │ 状态  │ 索引 │   待办     │         创建时间           │ 完成时间  │
-├─────────┼──────┼──────┼───────────┼───────────────────────────┼──────────┤
-│    0    │ '❌' │  0   │   '123'   │ '2024-04-11 19:16:22 206' │   '-'    │
-│    1    │ '❌' │  1   │   '321'   │ '2024-04-11 19:16:22 206' │   '-'    │
-│    2    │ '❌' │  2   │ '1234567' │ '2024-04-11 19:16:22 206' │   '-'    │
-└─────────┴──────┴──────┴───────────┴───────────────────────────┴──────────┘
+todo -h
 ```
 
-- 不跟参数
+![](README_files/1.jpg)
+
+**查看版本**
 
 ```bash
-# 显示当前`table`的所有待办
-$ todo
-
-┌─────────┬──────┬──────┬───────────┬───────────────────────────┬──────────┐
-│ (index) │ 状态  │ 索引 │   待办     │         创建时间           │ 完成时间  │
-├─────────┼──────┼──────┼───────────┼───────────────────────────┼──────────┤
-│    0    │ '❌' │  0   │   '123'   │ '2024-04-11 19:16:22 206' │   '-'    │
-│    1    │ '❌' │  1   │   '321'   │ '2024-04-11 19:16:22 206' │   '-'    │
-│    2    │ '❌' │  2   │ '1234567' │ '2024-04-11 19:16:22 206' │   '-'    │
-└─────────┴──────┴──────┴───────────┴───────────────────────────┴──────────┘
+todo -V
 ```
 
-- 查看帮助
+![](README_files/2.jpg)
+
+**添加待办**
 
 ```bash
-$ todo -h
-$ todo add -h
-$ todo rm -h
-$ todo mod -h
-$ todo list -h
-$ todo done -h
-$ todo clear -h
-$ todo conf -h
+todo 1
 ```
 
-- 跟命令
+![](README_files/3.jpg)
 
 ```bash
-# 添加待办
-$ todo add 123 321 ... 
-
-# 添加并完成
-$ todo add 123 321 ... -d
-
-# 移除索引(索引不是index)为：1、2、5、6、7的待办
-$ todo rm 1 2 5-7
-
-# 将索引为1的待办内容修改为111
-$ todo mod 1 111
-
-# 将索引为1的待办内容追加上111
-$ todo mod 1 111 -a
-
-# 将索引为1的待办状态修改为完成
-$ todo mod 1 -d
-
-# 将索引为1的待办状态修改为未完成
-$ todo mod 1 -d false
-
-# 显示当前`table`的所有待办
-$ todo list
-
-# 显示当前`table`的所有已经完成的待办
-$ todo list -d 
-
-# 显示当前`table`的所有未完成的待办
-$ todo list -d false
-
-# 显示当前`table`索引从3开始的所有待办
-$ todo list 3
-$ todo list 3-
-
-# 显示当前`table`索引从0到3的所有待办
-$ todo list 3] 
-$ todo list 0-3
-
-# 显示当前`table`待办数量
-$ todo list -c
-
-# 修改索引为1、2、3的待办的状态为完成
-$ todo done 1 2 3
-
-# 清空当前`table`待办
-$ todo clear
-
-# 显示当前配置
-$ todo conf 
-$ todo conf list
-
-# 显示所有内置变量
-$ todo conf -v
-
-# 将当前`table`修改为newtable
-$ todo conf set table newtable
-
-# 显示所有表
-$ todo conf list table
-
+todo add 2
 ```
 
-#### 参与贡献
+![](README_files/4.jpg)
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+**批量添加待办**
+
+```bash
+todo 3 4 5
+```
+
+![](README_files/5.jpg)
+
+```bash
+todo add 6 7 8
+```
+
+![](README_files/6.jpg)
+
+**添加待办时设置完成**
+
+```bash
+todo add 9 -d
+```
+
+![](README_files/7.jpg)
+
+**移除待办项**
+
+```bash
+todo rm 8
+```
+
+![](README_files/8.jpg)
+
+**批量移除待办项**
+
+```bash
+todo rm 7 6 5 4 3 2 1 0
+```
+
+![](README_files/9.jpg)
+
+```bash
+todo rm 8 4 7 3 6 2 5 0 1
+```
+
+![](README_files/10.jpg)
+
+> 索引顺序不敏感
+
+**修改待办内容**
+
+```bash
+todo mod 0 after
+```
+
+*之前*
+
+![](README_files/11.jpg)
+
+*之后*
+
+![](README_files/12.jpg)
+
+**待办内容后追加**
+
+```bash
+todo mod 0 \ append -a
+```
+
+*之前*
+
+![](README_files/13.jpg)
+
+*之后*
+
+![](README_files/14.jpg)
+
+**修改待办状态为完成**
+
+```bash
+todo mod 0 -d true
+```
+
+![](README_files/15.jpg)
+
+```bash
+todo done 0
+```
+
+![](README_files/16.jpg)
+
+**查看所有待办**
+
+```bash
+todo
+```
+
+![](README_files/17.jpg)
+
+```bash
+todo list
+```
+
+![](README_files/18.jpg)
+
+**查看所有已完成的待办**
+
+```bash
+todo list -d
+```
+
+![](README_files/19.jpg)
+
+```bash
+todo list -d true
+```
+
+![](README_files/20.jpg)
+
+**查看所有未完成的待办**
+
+![](README_files/21.jpg)
+
+**查看前五个待办**
+
+```bash
+todo list 5]
+```
+
+![](README_files/22.jpg)
+
+**查看第五个之后的待办**
+
+```bash
+todo list 5
+```
+
+![](README_files/23.jpg)
+

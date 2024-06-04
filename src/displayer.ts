@@ -1,5 +1,6 @@
 import { Printer } from "./printer";
 import { TODO_Item } from "./types";
+import { assert, widthOfStr } from "./utils";
 
 export class Displayer{
     constructor(
@@ -11,18 +12,23 @@ export class Displayer{
             return []
         }
         const needPlaceholder = todolist[0].index !== 0;
-        const result = todolist.map(todo => {
-            return this.createDisplayTodoItem(
-                todo.index,
-                todo.todo,
-                todo.done ? "✅" : "❌",
-                // todo.done ? "✅" : "❎",
-                // todo.done ? "√" : "×",
-                todo.begin,
-                todo.end ?? "-"
-            )
+        let maxLength = 0;
+        const result = todolist
+            .map(todo => {
+                maxLength = Math.max(maxLength, widthOfStr(todo.todo));
+                return todo;
+            })
+            .map(todo => {
+                return this.createDisplayTodoItem(
+                    todo.index,
+                    this.completionTodo(todo.todo, maxLength),
+                    todo.done ? "✅" : "❌",
+                    // todo.done ? "✅" : "❎",
+                    // todo.done ? "√" : "×",
+                    todo.begin,
+                    todo.end ?? "-"
+                )
         })
-
         return needPlaceholder ? [this.createDisplayTodoItem("...", "...", "...", "...", "..."), ...result] : result
     }
 
@@ -35,5 +41,12 @@ export class Displayer{
             "创建时间": begin,
             "完成时间": end
         }
+    }
+
+    private completionTodo(todo: string, max: number): string {
+        assert(todo.length <= max);
+
+        let len = 0;
+        return ((len = max - widthOfStr(todo)) > 0) ? `${todo}${" ".repeat(len)}` : todo;
     }
 }

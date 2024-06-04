@@ -39,6 +39,23 @@ export function checkNumber(num: string, loger?: Loger): boolean {
 export function isBuiltinVariable(mayVar: string): boolean {
     return !!Object.values(BuiltinConfigVariable).find(key => key === mayVar);
 }
+export function assert(result: boolean, message?: string) {
+    if(!result){
+        throw new Error(message ?? "Debug Failure.");
+    }
+}
+export function widthOfStr(str: string): number {
+    let len = 0;
+    for (let i = 0; i < str.length; ++i) {
+        if (str.charCodeAt(i) > 255) {
+            len += 2;
+        }
+        else {
+            len++;
+        }
+    }
+    return len;
+}
 
 export class File<S extends object = {}> {
     constructor(private _filePath: string) {}

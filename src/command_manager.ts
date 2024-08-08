@@ -172,6 +172,7 @@ export class ModifyCommand extends BuiltinCommandBase {
             .argument("<index>", "索引序号")
             .argument("[todo]", "待办内容")
             .option("-a --append", "在原内容上追加，指定参数todo后生效", false)
+            .option("-i --insert", "在原内容上头插，指定参数todo后生效，优先级低于append", false)
             .option("-d --done [done[true|false]]", "修改为完成")
             .action(this.actionImp);
     }
@@ -194,7 +195,18 @@ export class ModifyCommand extends BuiltinCommandBase {
                 return;
             }
 
-            !!todo ? (option.append ? item.todo += todo : item.todo = todo) : void 0;
+            if(!!todo){
+                if (option.append) {
+                    item.todo += todo;
+                }
+                else if(option.insert){
+                    item.todo = todo + item.todo;
+                }
+                else {
+                    item.todo = todo;
+                }
+            }
+
             if (option.done) {
                 const done = this.optionDone(option);
                 item.done = done;

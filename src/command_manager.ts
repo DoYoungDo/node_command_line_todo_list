@@ -16,11 +16,16 @@ enum BuiltInCommand {
     DONE = "done",
     CLEAR = "clear",
     RISE = "rise",
+    MOVE = "mv",
     FIND = "find",
     CONF = "conf"
 }
 
 abstract class BuiltinCommandBase extends Command{
+    constructor(){
+        super();
+        this.action(this.actionImp);
+    }
     abstract actionImp(...args: any[]): void;
 }
 
@@ -442,6 +447,68 @@ export class RiseCommand extends BuiltinCommandBase {
             console.trace(error);
         }
 
+    }
+}
+
+export class MoveCommand extends BuiltinCommandBase{
+    constructor(private _configer:Configer, private _loger:Loger){
+        super();
+        this.name(BuiltInCommand.MOVE)
+            .description("移动 待办项")
+            .argument("<index>", "待移动的待办项索引序号")
+            .argument("<dist index>", "目标索引序号");
+    }
+
+    actionImp(arg0: string, arg1: string): void {
+        try {
+            if (!checkNumber(arg0, this._loger)) {
+                return;
+            }
+            if (!checkNumber(arg1, this._loger)) {
+                return;
+            }
+            const index = Number.parseInt(arg0);
+            const distIndex = Number.parseInt(arg1);
+            if (index < 0 || distIndex < 0) {
+                this._loger.logWarn("invalid index or dist index, index and dost index must > 0");
+                return;
+            }
+        
+
+            const todoModle = new Todo(this._configer);
+            const table = todoModle.getTable();
+            let list = table.list;
+
+            if(index === distIndex){
+                // 打印列表
+                new Printer().printTable(new Displayer().displayTodoList(table.list));
+                return;
+            }
+
+            let beforeIndexArr = list.slice(0, index);
+            let indexItem = list[index];
+            let afterIndexArr = list.slice(index + 1);
+
+            // 向前移动
+            if(index > distIndex){
+                list = beforeIndexArr.slice(0,distIndex).concat(indexItem).concat(beforeIndexArr.slice(distIndex)).concat(afterIndexArr);
+            }
+            // 身后移动
+            else{
+                list = beforeIndexArr.concat(afterIndexArr.slice(0, distIndex - index)).concat(indexItem).concat(afterIndexArr.slice(distIndex - index));
+            }
+
+            // 重新构建索引
+            table.list = list.map((item, index) => { item.index = index; return item; });
+
+            // 更新列表
+            todoModle.setTable(table); 
+
+            // 打印列表
+            new Printer().printTable(new Displayer().displayTodoList(table.list));
+        } catch (error) {
+            console.trace(error);
+        }
     }
 }
 

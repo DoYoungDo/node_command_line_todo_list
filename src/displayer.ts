@@ -4,7 +4,7 @@ import { assert, widthOfStr } from "./utils";
 
 export class Displayer{
     constructor(
-        private _printer:Printer
+        private _printer?: Printer
     ){}
 
     displayTodoList(todolist: TODO_Item[]): any[] {

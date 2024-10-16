@@ -6,6 +6,7 @@ export type TODO_Item = {
     done: boolean
     begin: TODO_Date
     end?: TODO_Date
+    description?: string[]
 }
 
 export type TODO_Table = {

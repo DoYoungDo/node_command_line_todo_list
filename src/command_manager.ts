@@ -18,7 +18,8 @@ enum BuiltInCommand {
     RISE = "rise",
     MOVE = "mv",
     FIND = "find",
-    CONF = "conf"
+    CONF = "conf",
+    DET = "det"
 }
 
 abstract class BuiltinCommandBase extends Command{
@@ -66,9 +67,8 @@ export class AddCommand extends BuiltinCommandBase {
         this._displayer = new Displayer(this._printer);
 
         this.name(BuiltInCommand.ADD)
-            .description("添加 待办项")
-            .argument("<todo...>", "待办项")
-            .option("-d --done", "添加时完成", false)
+            .description("待办项 详情")
+            .argument("<todo>", "待办项")
             .action(this.actionImp);
     }
 
@@ -653,6 +653,21 @@ export namespace ConfigCommand{
             this._configer.setConfig(name as any, value);
         }
     }
+}
+
+export class DetailCommand extends BuiltinCommandBase{
+    constructor(){
+        super()
+        this.name(BuiltInCommand.DET)
+            .description("添加 待办项")
+            .argument("<index...>", "待办项")
+            .action(this.actionImp);
+    }
+    actionImp(...args: any[]): void {
+        console.log("...")
+        // throw new Error("Method not implemented.");
+    }
+
 }
 
 export class CommandManager{

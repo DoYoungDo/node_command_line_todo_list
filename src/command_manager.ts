@@ -67,8 +67,9 @@ export class AddCommand extends BuiltinCommandBase {
         this._displayer = new Displayer(this._printer);
 
         this.name(BuiltInCommand.ADD)
-            .description("待办项 详情")
-            .argument("<todo>", "待办项")
+            .description("添加 待办项")
+            .argument("<todo...>", "待办项")
+            .option("-d --done", "添加时完成", false)
             .action(this.actionImp);
     }
 
@@ -659,9 +660,8 @@ export class DetailCommand extends BuiltinCommandBase{
     constructor(){
         super()
         this.name(BuiltInCommand.DET)
-            .description("添加 待办项")
-            .argument("<index...>", "待办项")
-            .action(this.actionImp);
+            .description("待办项 详情")
+            .argument("<index>", "待办项")
     }
     actionImp(...args: any[]): void {
         console.log("...")

@@ -14,11 +14,11 @@ function initCommand(): CommandManager {
     CMD_MNGR.registerCommand(new ModifyCommand(configer, loger));
     CMD_MNGR.registerCommand(new ListCommand(configer));
     CMD_MNGR.registerCommand(new DoneCommand(configer));
-    CMD_MNGR.registerCommand(new DetailCommand());
     // CMD_MNGR.registerCommand(new RiseCommand(configer, loger));
     CMD_MNGR.registerCommand(new MoveCommand(configer, loger));
     CMD_MNGR.registerCommand(new FindCommand(configer));
     CMD_MNGR.registerCommand(new ClearCommand(configer, loger));
+    CMD_MNGR.registerCommand(new DetailCommand());
     CMD_MNGR.registerCommand(new ConfigCommand(configer, loger));
     return CMD_MNGR;
 }

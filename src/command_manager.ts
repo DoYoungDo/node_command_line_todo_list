@@ -93,6 +93,9 @@ export class AddCommand extends BuiltinCommandBase {
 
                 // 重新构建索引
                 todoList = todoList.map((item, index) => { item.index = index; return item; });
+                
+                // 保存
+                todoModle.list = todoList;
 
                 this._printer.printLine("表：", Setting.config.table);
                 this._printer.printTable(this._displayer.displayTodoList(todoList)); 

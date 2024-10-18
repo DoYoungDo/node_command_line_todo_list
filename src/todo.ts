@@ -4,6 +4,7 @@ import { TODO_Table } from "./types";
 import { createTodoTable, File, getAppData, getFormatDate } from "./utils";
 import { BuiltinConfigVariable, Configer } from "./configer";
 import { Setting } from "./setting";
+import { Loger } from "./loger";
 
 export type TodoDate = string;
 
@@ -26,7 +27,7 @@ export type TodoList = {
 export class Todo{
     private _todoFilePath: string
     private _todoListFile: TodoList;
-    constructor(private _configer:Configer) {
+    constructor(private _configer: Configer = new Configer()) {
         this._todoFilePath = path.join(Setting.TODO_LIST_DIR, Setting.config.table);
         this._todoListFile = new File<TodoList>(this._todoFilePath).create({
             name: Setting.config.table,

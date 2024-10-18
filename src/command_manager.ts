@@ -7,6 +7,7 @@ import { Printer } from "./printer";
 import { Displayer } from "./displayer";
 import { BuiltinConfigVariable, BuiltinConfigVariableDescription, Configer } from "./configer";
 import { Loger } from "./loger";
+import { Setting } from "./setting";
 
 enum BuiltInCommand {
     ADD = "add",
@@ -75,13 +76,13 @@ export class AddCommand extends BuiltinCommandBase {
 
     actionImp(args: string[], options: any): void {
         try {
-            const todoModle = new Todo(this._configer)
-            const table = todoModle.getTable();
+            const todoModle = new Todo()
+            const todoList = todoModle.list;
 
             const begin = getFormatDate(Date.now());
             const todos = args.map((arg, index) => {
                 let item: TODO_Item = {
-                    index: table.list.length - 1 + index + 1,
+                    index: todoList.length - 1 + index + 1,
                     todo: arg,
                     done: options.done,
                     begin,
@@ -90,11 +91,11 @@ export class AddCommand extends BuiltinCommandBase {
                 return item
             })
 
+            this._printer.printLine("表：", Setting.config.table);
             this._printer.printTable(this._displayer.displayTodoList(todos));
 
-            table.list.push(...todos);
-
-            todoModle.setTable(table);
+            todoList.push(...todos);
+            todoModle.list = todoList;
         } catch (error) {
             console.trace(error);
         }
@@ -147,13 +148,11 @@ export class RemoveCommand extends BuiltinCommandBase {
 
         // const indexs: number[] = args.map(arg => Number.parseInt(arg)).filter(num => !isNaN(num));
         try {
-            const todoModle = new Todo(this._configer)
-            const table = todoModle.getTable();
-            const list = (table.list as any[]).filter((item) => !indexSet.has(item.index)).map((item, index) => { item.index = index; return item });
-            table.list = list;
-            this._printer.printTable(this._displayer.displayTodoList(table.list));
+            const todoModle = new Todo()
+            const todoList = (todoModle.list as any[]).filter((item) => !indexSet.has(item.index)).map((item, index) => { item.index = index; return item });
+            todoModle.list = todoList;
 
-            todoModle.setTable(table);
+            this._printer.printTable(this._displayer.displayTodoList(todoList));
         } catch (error) {
             console.trace(error);
         }
@@ -188,11 +187,11 @@ export class ModifyCommand extends BuiltinCommandBase {
         const todo = arg1;
 
         try {
-            const todoModle = new Todo(this._configer);
-            const table: TODO_Table = todoModle.getTable();
-            const item: TODO_Item | undefined = table.list.find((_, i) => i === index);
+            const todoModle = new Todo();
+            const todoList = todoModle.list;
+            const item: TODO_Item | undefined = todoList.find((_, i) => i === index);
             if (!item) {
-                this._loger.logErr("index out if reange.", "todo list length:", `${table.list.length}`);
+                this._loger.logErr("index out if reange.", "todo list length:", `${todoList.length}`);
                 return;
             }
 
@@ -214,9 +213,10 @@ export class ModifyCommand extends BuiltinCommandBase {
                 item.end = done ? getFormatDate(Date.now()) : "-"
             }
 
-            this._printer.printTable(this._displayer.displayTodoList([item]));
+            todoModle.list = todoList;
 
-            todoModle.setTable(table);
+            this._printer.printLine("表：", Setting.config.table);
+            this._printer.printTable(this._displayer.displayTodoList([item]));
         } catch (error) {
             console.trace(error);
         }
@@ -257,16 +257,16 @@ export class ListCommand extends BuiltinCommandBase {
 
     actionImp(arg: string, options: any): void {
         try {
-            const todo = new Todo(this._configer);
-            const table = todo.getTable();
+            const todo = new Todo();
+            const todolist = todo.list;
             if (options.count){
-                this._printer.printLine("count:", table.list.length);
+                this._printer.printLine("count:", todolist.length);
                 return;
             }
 
             const [begin, end] = this.getRange(arg);
 
-            const list = table.list.filter((item, index) => {
+            const list = todolist.filter((item, index) => {
                 if (begin && index < begin) {
                     return false;
                 }
@@ -287,6 +287,7 @@ export class ListCommand extends BuiltinCommandBase {
                 return true;
             })
 
+            this._printer.printLine("表：", Setting.config.table);
             this._printer.printTable(this._displayer.displayTodoList(list));
         } catch (error) {
             console.trace(error);
@@ -341,9 +342,9 @@ export class DoneCommand extends BuiltinCommandBase {
         const todos: any[] = [];
 
         try {
-            const todoModle = new Todo(this._configer);
-            const table = todoModle.getTable();
-            table.list.forEach((item: any, index: number) => {
+            const todoModle = new Todo();
+            const todoList = todoModle.list;
+            todoList.forEach((item: any, index: number) => {
                 if (indexs.includes(index)) {
                     item.done = true;
                     item.end = date;
@@ -351,9 +352,10 @@ export class DoneCommand extends BuiltinCommandBase {
                 }
             });
 
+            todoModle.list = todoList;
+            
+            this._printer.printLine("表：", Setting.config.table);
             this._printer.printTable(this._displayer.displayTodoList(todos));
-
-            todoModle.setTable(table);
         } catch (error) {
             console.trace(error);
         }
@@ -382,13 +384,11 @@ export class ClearCommand extends BuiltinCommandBase {
 
             readline.question("sure to clear all todo? y/n", (msg) => {
                 if (msg.toLowerCase() === "y") {
-                    const todo = new Todo(this._configer);
-                    const table = todo.getTable();
-                    table.list = [];
+                    const todo = new Todo();
+                    todo.list = [];
 
+                    this._printer.printLine("表：", Setting.config.table);
                     this._printer.printTable([]);
-
-                    todo.setTable(table);
                 }
                 else {
                     this._loger.logInfo(msg)
@@ -400,66 +400,6 @@ export class ClearCommand extends BuiltinCommandBase {
         } catch (error) {
             console.trace(error);
         }
-    }
-}
-
-export class RiseCommand extends BuiltinCommandBase {
-    private _printer: Printer;
-    private _displayer: Displayer;
-    constructor(private _configer: Configer, private _loger: Loger) {
-        super();
-        this._printer = new Printer;
-        this._displayer = new Displayer(this._printer);
-
-        this.name(BuiltInCommand.RISE)
-            .description("提升 待办项")
-            .argument("<count>", "提升数量")
-            .argument("<index...>", "索引序号")
-            .option("-d --down", "反射提升")
-            .action(this.actionImp);
-    }
-
-    actionImp(arg0: string, arg1: string[], option: any): void {
-        try {
-            if (!checkNumber(arg0, this._loger)) {
-                return;
-            }
-            const count = Number.parseInt(arg0);
-            if (count <= 0) {
-                this._loger.logWarn("invalid count, count must > 0");
-                return;
-            }
-
-            const indexs = arg1.filter(arg => checkNumber(arg)).map(item => Number.parseInt(item));
-            if (!indexs.length) {
-                this._loger.logErr("got no valid index");
-                return;
-            }
-
-            const todoModle = new Todo(this._configer);
-            const table = todoModle.getTable();
-            let list = table.list;
-            for (let index of indexs) {
-                if (index < 0) {
-                    continue;
-                }
-
-                const item = list.find(item => item.index === index)!;
-                const listWithoutIndexItem = list.filter(item => item.index !== index);
-
-                const targetIndex = option.down ? (index + count) : ((index - count) < 0 ? 0 : index - count);
-                list = listWithoutIndexItem.slice(0, targetIndex).concat([item]).concat(listWithoutIndexItem.slice(targetIndex));
-            }
-
-            table.list = list.map((item, index) => { item.index = index; return item; });
-
-            this._printer.printTable(this._displayer.displayTodoList(table.list));
-
-            todoModle.setTable(table);
-        } catch (error) {
-            console.trace(error);
-        }
-
     }
 }
 
@@ -488,37 +428,41 @@ export class MoveCommand extends BuiltinCommandBase{
             }
         
 
-            const todoModle = new Todo(this._configer);
-            const table = todoModle.getTable();
-            let list = table.list;
+            const todoModle = new Todo();
+            let todoList = todoModle.list;
 
+            if (index > todoList.length - 1) {
+                this._loger.logWarn("invalid index, index must <", `${todoList.length - 1}`);
+                return;
+            }
+            
             if(index === distIndex){
                 // 打印列表
-                new Printer().printTable(new Displayer().displayTodoList(table.list));
+                new Printer().printTable(new Displayer().displayTodoList(todoList));
                 return;
             }
 
-            let beforeIndexArr = list.slice(0, index);
-            let indexItem = list[index];
-            let afterIndexArr = list.slice(index + 1);
+            let beforeIndexArr = todoList.slice(0, index);
+            let indexItem = todoList[index];
+            let afterIndexArr = todoList.slice(index + 1);
 
             // 向前移动
             if(index > distIndex){
-                list = beforeIndexArr.slice(0,distIndex).concat(indexItem).concat(beforeIndexArr.slice(distIndex)).concat(afterIndexArr);
+                todoList = beforeIndexArr.slice(0,distIndex).concat(indexItem).concat(beforeIndexArr.slice(distIndex)).concat(afterIndexArr);
             }
             // 身后移动
             else{
-                list = beforeIndexArr.concat(afterIndexArr.slice(0, distIndex - index)).concat(indexItem).concat(afterIndexArr.slice(distIndex - index));
+                todoList = beforeIndexArr.concat(afterIndexArr.slice(0, distIndex - index)).concat(indexItem).concat(afterIndexArr.slice(distIndex - index));
             }
 
             // 重新构建索引
-            table.list = list.map((item, index) => { item.index = index; return item; });
+            todoList = todoList.map((item, index) => { item.index = index; return item; });
 
             // 更新列表
-            todoModle.setTable(table); 
+            todoModle.list = todoList;
 
             // 打印列表
-            new Printer().printTable(new Displayer().displayTodoList(table.list));
+            new Printer().printTable(new Displayer().displayTodoList(todoList));
         } catch (error) {
             console.trace(error);
         }
@@ -543,13 +487,13 @@ export class FindCommand extends BuiltinCommandBase {
     }
 
     actionImp(arg0: string[], option: any): void {
-        const todoModle = new Todo(this._configer);
         const filters = option.caseSensitive ? arg0 : arg0.map(arg => arg.toLowerCase());
         const done = option.done === undefined ? undefined : (/false/.test(option.done) ? false : true);
 
-        const table = todoModle.getTable();
+        const todoModle = new Todo();
+        const todoList = todoModle.list;
 
-        let list = table.list.filter(done === undefined ? item => item : item => item.done === done)
+        let list = todoList.filter(done === undefined ? item => item : item => item.done === done)
             .filter(item => {
                 let todo = option.caseSensitive ? item.todo : item.todo.toLowerCase();
                 if (option.single) {

@@ -2,11 +2,11 @@
 
 import { Configer } from "./configer";
 import { Loger } from "./loger";
-import { AddCommand, ClearCommand, CommandManager, ConfigCommand, DetailCommand, DoneCommand, FindCommand, ListCommand, ModifyCommand, MoveCommand, RemoveCommand, RiseCommand } from "./command_manager";
+import { AddCommand, ClearCommand, CommandManager, ConfigCommand, DetailCommand, DoneCommand, FindCommand, ListCommand, ModifyCommand, MoveCommand, RemoveCommand } from "./command_manager";
 import { Setting } from "./setting";
 
 const loger: Loger = new Loger;
-const configer: Configer = new Configer(loger);
+const configer: Configer = new Configer();
 
 
 function initCommand(): CommandManager {
@@ -16,7 +16,6 @@ function initCommand(): CommandManager {
     CMD_MNGR.registerCommand(new ModifyCommand(configer, loger));
     CMD_MNGR.registerCommand(new ListCommand(configer));
     CMD_MNGR.registerCommand(new DoneCommand(configer));
-    // CMD_MNGR.registerCommand(new RiseCommand(configer, loger));
     CMD_MNGR.registerCommand(new MoveCommand(configer, loger));
     CMD_MNGR.registerCommand(new FindCommand(configer));
     CMD_MNGR.registerCommand(new ClearCommand(configer, loger));

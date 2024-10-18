@@ -33,9 +33,7 @@ export class Configer {
     private _configs: LocalConfig = DEFAULT_CONFIG;
     private _history = DEFAULT_HISTORY;
     private _backup: File;
-    constructor(
-        private _loger: Loger,
-    ) {
+    constructor() {
         this._CONFIG_DIR= path.join(os.homedir(), ".todo");
         this._CONFIG_TODO_PATH = path.join(this._CONFIG_DIR, ".todo");
         this._CONFIG_HISTORY_PATH = path.join(this._CONFIG_DIR, ".history");

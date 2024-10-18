@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { Command } from "commander";
 import { TODO_Item, TODO_Table } from "./types";
 import { Todo } from "./todo";
@@ -71,30 +72,48 @@ export class AddCommand extends BuiltinCommandBase {
             .description("添加 待办项")
             .argument("<todo...>", "待办项")
             .option("-d --done", "添加时完成", false)
+            .option("-f --file", "从文件添加")
             .action(this.actionImp);
     }
 
     actionImp(args: string[], options: any): void {
         try {
             const todoModle = new Todo()
-            const todoList = todoModle.list;
+            let todoList = todoModle.list;
 
-            const begin = getFormatDate(Date.now());
-            const todos = args.map((arg, index) => {
-                let item: TODO_Item = {
-                    index: todoList.length - 1 + index + 1,
-                    todo: arg,
-                    done: options.done,
-                    begin,
+            if(options.file){
+                const filePath = args.find(arg => fs.existsSync(arg));
+                if (!filePath) {
+                    this._printer.printLine("文件不存在");
+                    return;
                 }
-                options.done ? item.end = begin : void 0;
-                return item
-            })
+                const fTodo = new Todo(filePath);
+                const fTodoList = fTodo.list || [];
+                todoList.push(...fTodoList);
 
-            this._printer.printLine("表：", Setting.config.table);
-            this._printer.printTable(this._displayer.displayTodoList(todos));
+                // 重新构建索引
+                todoList = todoList.map((item, index) => { item.index = index; return item; });
 
-            todoList.push(...todos);
+                this._printer.printLine("表：", Setting.config.table);
+                this._printer.printTable(this._displayer.displayTodoList(todoList)); 
+            }
+            else{
+                const begin = getFormatDate(Date.now());
+                const todos = args.map((arg, index) => {
+                    let item: TODO_Item = {
+                        index: todoList.length - 1 + index + 1,
+                        todo: arg,
+                        done: options.done,
+                        begin,
+                    }
+                    options.done ? item.end = begin : void 0;
+                    return item
+                })
+                todoList.push(...todos);
+                this._printer.printLine("表：", Setting.config.table);
+                this._printer.printTable(this._displayer.displayTodoList(todos));
+            }
+
             todoModle.list = todoList;
         } catch (error) {
             console.trace(error);

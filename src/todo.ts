@@ -27,8 +27,8 @@ export type TodoList = {
 export class Todo{
     private _todoFilePath: string
     private _todoListFile: TodoList;
-    constructor(private _configer: Configer = new Configer()) {
-        this._todoFilePath = path.join(Setting.TODO_LIST_DIR, Setting.config.table);
+    constructor(private _filePath?: string, private _configer: Configer = new Configer()) {
+        this._todoFilePath = _filePath ?? path.join(Setting.TODO_LIST_DIR, Setting.config.table);
         this._todoListFile = new File<TodoList>(this._todoFilePath).create({
             name: Setting.config.table,
             date: getFormatDate(Date.now()),

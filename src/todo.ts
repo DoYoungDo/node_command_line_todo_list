@@ -1,11 +1,47 @@
 import * as path from "path";
 import * as fs from "fs";
 import { TODO_Table } from "./types";
-import { createTodoTable, getAppData } from "./utils";
+import { createTodoTable, File, getAppData, getFormatDate } from "./utils";
 import { BuiltinConfigVariable, Configer } from "./configer";
+import { Setting } from "./setting";
+
+export type TodoDate = string;
+
+export type TodoItem = {
+    index: number
+    todo: string
+    done: boolean
+    begin: TodoDate
+    end?: TodoDate
+    description?: string[]
+}
+
+export type TodoList = {
+    name: string
+    date: TodoDate
+    list: TodoItem[]
+}
+
 
 export class Todo{
+    private _todoFilePath: string
+    private _todoListFile: TodoList;
     constructor(private _configer:Configer) {
+        this._todoFilePath = path.join(Setting.TODO_LIST_DIR, Setting.config.table);
+        this._todoListFile = new File<TodoList>(this._todoFilePath).create({
+            name: Setting.config.table,
+            date: getFormatDate(Date.now()),
+            list: []
+        }).read();
+     }
+
+    get list(): TodoItem[] {
+        return this._todoListFile.list;
+    }
+
+    set list(ls: TodoItem[]) {
+        this._todoListFile.list = ls;
+        new File<TodoList>(this._todoFilePath).write(this._todoListFile);
     }
 
     getTable(): TODO_Table/*  | undefined */ {

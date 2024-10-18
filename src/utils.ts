@@ -65,7 +65,8 @@ export class File<S extends object = {}> {
             if(!fs.existsSync(dir)){
                 fs.mkdirSync(dir, { recursive: true })
             }
-            fs.writeFileSync(this._filePath, JSON.stringify(data, null, "    "));
+            this.write(data);
+            // fs.writeFileSync(this._filePath, JSON.stringify(data, null, "    "));
         }
         return this;
     }

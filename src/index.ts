@@ -3,9 +3,11 @@
 import { Configer } from "./configer";
 import { Loger } from "./loger";
 import { AddCommand, ClearCommand, CommandManager, ConfigCommand, DetailCommand, DoneCommand, FindCommand, ListCommand, ModifyCommand, MoveCommand, RemoveCommand, RiseCommand } from "./command_manager";
+import { Setting } from "./setting";
 
 const loger: Loger = new Loger;
 const configer: Configer = new Configer(loger);
+
 
 function initCommand(): CommandManager {
     const CMD_MNGR = new CommandManager(process.argv);
@@ -24,5 +26,7 @@ function initCommand(): CommandManager {
 }
 
 (function main() {
+    Setting.init();
+
     initCommand().run();
 })();

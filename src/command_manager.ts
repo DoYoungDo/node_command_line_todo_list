@@ -8,7 +8,7 @@ import { Printer } from "./printer";
 import { Displayer } from "./displayer";
 import { BuiltinConfigVariable, BuiltinConfigVariableDescription, Configer } from "./configer";
 import { Loger } from "./loger";
-import { Setting } from "./setting";
+import { Setting, Config } from "./setting";
 
 enum BuiltInCommand {
     ADD = "add",
@@ -542,13 +542,20 @@ export class ConfigCommand extends BuiltinCommandBase {
             .description("配置")
             .action(this.actionImp);
 
-        this.addCommand(new ConfigCommand.ListCommand(this._configer));
+        // this.addCommand(new ConfigCommand.ListCommand(this._configer));
         this.addCommand(new ConfigCommand.SetCommand(this._configer, this._loger));
     }
 
     actionImp(option: any): void {
-        const list = this.commands.find((c: Command) => c.name() === ConfigCommand.Names.LIST);
-        list?.parse();
+        const configs: any[] = Object.keys(Setting.config).filter(key => typeof Setting.config[key] === "string").map(key => {
+            return {
+                "名称": key,
+                "值": Setting.config[key]
+            }
+        })
+        new Printer().printTable(configs);
+        // const list = this.commands.find((c: Command) => c.name() === ConfigCommand.Names.LIST);
+        // list?.parse();
     }
 }
 export namespace ConfigCommand{
@@ -557,6 +564,7 @@ export namespace ConfigCommand{
         SET = "set"
     }
 
+    // export class 
     export class ListCommand extends BuiltinCommandBase {
         private _printer: Printer;
         private _displayer: Displayer;
@@ -605,19 +613,17 @@ export namespace ConfigCommand{
             this._displayer = new Displayer(this._printer);
             this.name(Names.SET)
                 .description("修改配置")
-                .argument("<var>", "变量名称")
-                .argument("<value>", "变量值")
+                .argument("<key>", "名称")
+                .argument("<value>", "值")
                 .action(this.actionImp);
         }
 
         actionImp(name: string, value: string, option: any): void {
-            if (!isBuiltinVariable(name)) {
-                this._loger.logErr("unsupport variable name:", name);
-                this._loger.logTip("see: 'todo conf list -v'");
-                return;
-            }
+            Setting.config[name] = value;
 
-            this._configer.setConfig(name as any, value);
+            Setting.config = Setting.config;
+            
+            this.parent!.parse();
         }
     }
 }

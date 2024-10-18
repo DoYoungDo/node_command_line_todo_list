@@ -76,6 +76,7 @@ export class File<S extends object = {}> {
     }
 
     read():S{
+        // TODO 做缓存
         try {
             return JSON.parse(fs.readFileSync(this._filePath).toString()) as S;
         } catch (error) {

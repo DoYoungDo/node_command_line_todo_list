@@ -2,8 +2,10 @@ import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 import { File } from "./utils";
+import { Printer } from "./printer";
 
 export type Config = {
+    [key: string]: any
     table: string,
     tables: string[]
 }
@@ -14,10 +16,35 @@ export class Setting {
     static readonly TODO_SETTING_FILE_PATH = path.join(this.TOTO_HOME_DIR, "setting");
 
     static get config() :Config{
-        return new File<Config>(this.TODO_SETTING_FILE_PATH).create({
+        const conf = new File<Config>(this.TODO_SETTING_FILE_PATH).create({
             table: "default",
             tables: ["default"]
         }).read();
+        
+        const valueChecker: Map<string, (target: any, p: string | symbol, newValue: any) => boolean> = new Map()
+        valueChecker.set("table", (target: any, p: string | symbol, newValue: any): boolean => {
+            if (typeof newValue !== "string") {
+                new Printer().printLine(`无法为内置属性：${p as string} 设置无效的值：${newValue}`)
+                return true
+            }
+
+            const cfg = target as Config;
+            cfg.tables.includes(newValue) ? void 0 : cfg.tables.push(newValue);
+            cfg["table"] = newValue;
+        
+            Setting.config = cfg;
+
+            return true;
+        })
+
+        return new Proxy(conf,{
+            set(target: any, p: string | symbol, newValue: any, receiver: any): boolean {
+                if (valueChecker.has(p as string)) {
+                    return valueChecker.get(p as string)!(target, p, newValue)
+                }
+                return target[p] = newValue;
+            }
+        })
     }
 
     static set config(cfg: Config) {

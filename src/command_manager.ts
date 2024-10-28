@@ -34,7 +34,7 @@ abstract class BuiltinCommandBase extends Command{
 
 export class AppCommand extends BuiltinCommandBase{
     private readonly NAME = "todo";
-    private readonly VERSION = "1.0.1";
+    private readonly VERSION = "1.1.0";
     private readonly DESCRIPTION = "待办项";
 
     constructor() {

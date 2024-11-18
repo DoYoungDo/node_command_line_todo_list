@@ -555,6 +555,7 @@ export class ConfigCommand extends BuiltinCommandBase {
 
         // this.addCommand(new ConfigCommand.ListCommand(this._configer));
         this.addCommand(new ConfigCommand.SetCommand(this._configer, this._loger));
+        this.addCommand(new ConfigCommand.DeleteCommand());
     }
 
     actionImp(option: any): void {
@@ -572,7 +573,8 @@ export class ConfigCommand extends BuiltinCommandBase {
 export namespace ConfigCommand{
     export enum Names {
         LIST = "list",
-        SET = "set"
+        SET = "set",
+        DEL = "del"
     }
 
     // export class 
@@ -639,6 +641,20 @@ export namespace ConfigCommand{
             // Setting.config = Setting.config;
             
             this.parent!.parse();
+        }
+    }
+    export class DeleteCommand extends BuiltinCommandBase{
+        constructor(){
+            super();
+            // this._printer = new Printer;
+            // this._displayer = new Displayer(this._printer);
+            this.name(Names.DEL)
+                .description("删除配置项")
+                .argument("<key>", "名称")
+                .action(this.actionImp);
+        }
+        actionImp(name: string): void {
+            delete Setting.config[name];
         }
     }
 }

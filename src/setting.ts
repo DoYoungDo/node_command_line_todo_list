@@ -47,6 +47,16 @@ export class Setting {
                     Setting.config = target;
                     return result;
                 }
+            },
+            deleteProperty(target: any, p: string | symbol): boolean {
+                if(valueChecker.has(p as string)){
+                    return false;
+                }
+                else{
+                    let result = delete target[p];
+                    Setting.config = target;
+                    return result;
+                }
             }
         })
     }

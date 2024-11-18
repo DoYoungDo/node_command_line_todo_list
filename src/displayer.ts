@@ -1,5 +1,5 @@
 import { Printer } from "./printer";
-import { TODO_Item } from "./types";
+import { TodoItem } from "./todo";
 import { assert, widthOfStr } from "./utils";
 
 export class Displayer{
@@ -7,7 +7,7 @@ export class Displayer{
         private _printer?: Printer
     ){}
 
-    displayTodoList(todolist: TODO_Item[]): any[] {
+    displayTodoList(todolist: TodoItem[]): any[] {
         if (!todolist.length) {
             return []
         }
@@ -26,17 +26,19 @@ export class Displayer{
                     // todo.done ? "✅" : "❎",
                     // todo.done ? "√" : "×",
                     todo.begin,
-                    todo.end ?? "-"
+                    todo.end ?? "-",
+                    todo.priority ? "⭐".repeat(todo.priority) : ""
                 )
         })
-        return needPlaceholder ? [this.createDisplayTodoItem("...", "...", "...", "...", "..."), ...result] : result
+        return needPlaceholder ? [this.createDisplayTodoItem("...", "...", "...", "...", "...", ""), ...result] : result
     }
 
    
-    private createDisplayTodoItem(index: any, todo: any, done: any, begin: any, end: any): any {
+    private createDisplayTodoItem(index: any, todo: any, done: any, begin: any, end: any, priority: string): any {
         return {
             "状态": done,
             "索引": index,
+            "优先级": priority,
             "待办": todo,
             "创建时间": begin,
             "完成时间": end

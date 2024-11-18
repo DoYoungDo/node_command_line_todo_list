@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { Command } from "commander";
-import { TODO_Item, TODO_Table } from "./types";
-import { Todo } from "./todo";
+// import { TODO_Item, TODO_Table } from "./types";
+import { Priority, Todo, TodoItem } from "./todo";
 import { checkNumber, getFormatDate, isBuiltinVariable } from "./utils";
 import * as readLine from "readline";
 import { Printer } from "./printer";
@@ -104,7 +104,7 @@ export class AddCommand extends BuiltinCommandBase {
             else{
                 const begin = getFormatDate(Date.now());
                 const todos = args.map((arg, index) => {
-                    let item: TODO_Item = {
+                    let item: TodoItem = {
                         index: todoList.length - 1 + index + 1,
                         todo: arg,
                         done: options.done,
@@ -197,6 +197,7 @@ export class ModifyCommand extends BuiltinCommandBase {
             .option("-a --append", "在原内容上追加，指定参数todo后生效", false)
             .option("-i --insert", "在原内容上头插，指定参数todo后生效，优先级低于append", false)
             .option("-d --done [done[true|false]]", "修改为完成")
+            .option("-p --priority <priority[1-5]>", "设置优先级，取值1-5")
             .action(this.actionImp);
     }
 
@@ -212,7 +213,7 @@ export class ModifyCommand extends BuiltinCommandBase {
         try {
             const todoModle = new Todo();
             const todoList = todoModle.list;
-            const item: TODO_Item | undefined = todoList.find((_, i) => i === index);
+            const item: TodoItem | undefined = todoList.find((_, i) => i === index);
             if (!item) {
                 this._loger.logErr("index out if reange.", "todo list length:", `${todoList.length}`);
                 return;
@@ -234,6 +235,15 @@ export class ModifyCommand extends BuiltinCommandBase {
                 const done = this.optionDone(option);
                 item.done = done;
                 item.end = done ? getFormatDate(Date.now()) : "-"
+            }
+
+            if(option.priority){
+                try {
+                    let priority = Number.parseInt(option.priority);
+                    if (!isNaN(priority) && priority > 0 && priority < 6) {
+                        item.priority = priority as Priority;
+                    }
+                } catch (error) {}
             }
 
             todoModle.list = todoList;

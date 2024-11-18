@@ -2,7 +2,7 @@ import * as dayjs from "dayjs";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { TODO_Table } from "./types";
+// import { TODO_Table } from "./types";
 import { Loger } from "./loger";
 import { BuiltinConfigVariable } from "./configer";
 
@@ -16,14 +16,14 @@ export function getAppData(): string {
             return os.homedir();
     }
 }
-export function createTodoTable(name: string, author: string): TODO_Table {
-    return {
-        name,
-        author,
-        date: getFormatDate(Date.now()),
-        list: []
-    }
-}
+// export function createTodoTable(name: string, author: string): TODO_Table {
+//     return {
+//         name,
+//         author,
+//         date: getFormatDate(Date.now()),
+//         list: []
+//     }
+// }
 export function getFormatDate(date: number): string {
     return dayjs(date).format("YYYY-MM-DD HH:mm:ss SSS")
 }

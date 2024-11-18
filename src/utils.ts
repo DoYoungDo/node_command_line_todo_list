@@ -58,8 +58,11 @@ export function widthOfStr(str: string): number {
 }
 
 export class File<S extends object = {}> {
+    private _data: S | undefined;
     constructor(private _filePath: string) {}
     create(data: S): this {
+        this._data = data;
+
         if (!fs.existsSync(this._filePath)) {
             const dir = path.dirname(this._filePath);
             if(!fs.existsSync(dir)){
@@ -80,7 +83,7 @@ export class File<S extends object = {}> {
         try {
             return JSON.parse(fs.readFileSync(this._filePath).toString()) as S;
         } catch (error) {
-            return {} as S;
+            return this._data ?? {} as S;
         }
     }
 

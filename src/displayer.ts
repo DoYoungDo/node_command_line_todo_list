@@ -1,4 +1,5 @@
 import { Printer } from "./printer";
+import { Setting } from "./setting";
 import { TodoItem } from "./todo";
 import { assert, widthOfStr } from "./utils";
 
@@ -35,7 +36,7 @@ export class Displayer{
 
    
     private createDisplayTodoItem(index: any, todo: any, done: any, begin: any, end: any, priority: string): any {
-        return {
+        let obj: any = {
             "状态": done,
             "索引": index,
             "优先级": priority,
@@ -43,6 +44,18 @@ export class Displayer{
             "创建时间": begin,
             "完成时间": end
         }
+        // 过滤字段
+        let ignore_fields: string = Setting.config["ignore_fields"];
+        if(ignore_fields){
+            let fields = ignore_fields.split(";");
+            fields.forEach((field: string) => {
+                if(obj[field]){
+                    delete obj[field];
+                }
+            })
+        }
+
+        return obj;
     }
 
     private completionTodo(todo: string, max: number): string {

@@ -42,7 +42,11 @@ export class Setting {
                 if (valueChecker.has(p as string)) {
                     return valueChecker.get(p as string)!(target, p, newValue)
                 }
-                return target[p] = newValue;
+                else{
+                    let result = target[p] = newValue; 
+                    Setting.config = target;
+                    return result;
+                }
             }
         })
     }

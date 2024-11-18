@@ -630,9 +630,13 @@ export namespace ConfigCommand{
         }
 
         actionImp(name: string, value: string, option: any): void {
+            if(value === ""){
+                return;
+            }
+
             Setting.config[name] = value;
 
-            Setting.config = Setting.config;
+            // Setting.config = Setting.config;
             
             this.parent!.parse();
         }

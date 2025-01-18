@@ -381,6 +381,7 @@ export class DoneCommand extends BuiltinCommandBase {
                 if (indexs.includes(index)) {
                     item.done = true;
                     item.end = date;
+                    delete item.priority;
                     todos.push(item);
                 }
             });

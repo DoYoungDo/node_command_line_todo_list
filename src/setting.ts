@@ -9,11 +9,15 @@ export type Config = {
     table: string,
     tables: string[]
 }
+export type History = {
+    [key: string]: string[]
+}
 
 export class Setting {
     static readonly TOTO_HOME_DIR = path.join(os.homedir(), ".todo");
     static readonly TODO_LIST_DIR = path.join(this.TOTO_HOME_DIR, "todos");
     static readonly TODO_SETTING_FILE_PATH = path.join(this.TOTO_HOME_DIR, "setting");
+    static readonly TODO_HISTORY_FILE_PATH = path.join(this.TOTO_HOME_DIR, "history");
 
     static get config() :Config{
         const conf = new File<Config>(this.TODO_SETTING_FILE_PATH).create({
@@ -42,7 +46,15 @@ export class Setting {
                 if (valueChecker.has(p as string)) {
                     return valueChecker.get(p as string)!(target, p, newValue)
                 }
-                else{
+                else {
+                    // 保存历史
+                    let history = Setting.history;
+                    let array = history[p as any]
+                    array.push(target[p])
+                    history[p as any] = array;
+                    Setting.history = history;
+
+                    // 更新数据
                     let result = target[p] = newValue; 
                     Setting.config = target;
                     return result;
@@ -63,6 +75,20 @@ export class Setting {
 
     static set config(cfg: Config) {
         new File<Config>(this.TODO_SETTING_FILE_PATH).write(cfg);
+    }
+
+    static get history():History{
+        let his = new File<History>(this.TODO_HISTORY_FILE_PATH).create({}).read(); 
+        return new Proxy(his, {
+            get(target: any, p: string | symbol, receiver: any): any {
+                let result = target[p];
+                return result ? result : [];
+            }
+        })
+    }
+
+    static set history(his: History) {
+        new File<History>(this.TODO_HISTORY_FILE_PATH).write(his);
     }
 
     static init(){

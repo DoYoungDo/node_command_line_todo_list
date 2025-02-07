@@ -557,6 +557,7 @@ export class ConfigCommand extends BuiltinCommandBase {
         // this.addCommand(new ConfigCommand.ListCommand(this._configer));
         this.addCommand(new ConfigCommand.SetCommand(this._configer, this._loger));
         this.addCommand(new ConfigCommand.DeleteCommand());
+        this.addCommand(new ConfigCommand.HistoryCommand());
     }
 
     actionImp(option: any): void {
@@ -575,7 +576,8 @@ export namespace ConfigCommand{
     export enum Names {
         LIST = "list",
         SET = "set",
-        DEL = "del"
+        DEL = "del",
+        HIS = "his"
     }
 
     // export class 
@@ -656,6 +658,42 @@ export namespace ConfigCommand{
         }
         actionImp(name: string): void {
             delete Setting.config[name];
+        }
+    }
+    export class HistoryCommand extends BuiltinCommandBase {
+        constructor(){
+            super();
+            this.name(Names.HIS)
+                .description("显示配置项历史值")
+                .argument("<name>", "名称")
+                .option("-c --clear", "清空")
+                .action(this.actionImp);
+        }
+        actionImp(name: string, option: any): void {
+            let printer = new Printer();
+            let his = Setting.history[name];
+            if(his){
+                if(!his.length){
+                    printer.printLine([]);
+                    return;
+                }
+
+                if(option.clear){
+                    let allhis = Setting.history;
+                    allhis[name] = [];
+                    Setting.history = allhis;
+
+                    printer.printLine([]);
+                    return;
+                }
+
+                for(let h of his){
+                    printer.printLine([h]);
+                }
+            }
+            else{
+                printer.printLine([]);
+            }
         }
     }
 }

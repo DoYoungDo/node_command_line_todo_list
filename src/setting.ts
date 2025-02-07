@@ -43,16 +43,27 @@ export class Setting {
 
         return new Proxy(conf,{
             set(target: any, p: string | symbol, newValue: any, receiver: any): boolean {
-                if (valueChecker.has(p as string)) {
-                    return valueChecker.get(p as string)!(target, p, newValue)
-                }
-                else {
-                    // 保存历史
+
+                // 保存历史
+                const saveHistory = () => {
                     let history = Setting.history;
                     let array = history[p as any]
                     array.push(target[p])
                     history[p as any] = array;
                     Setting.history = history;
+                }
+
+                if (valueChecker.has(p as string)) {
+                    if (valueChecker.get(p as string)!(target, p, newValue)) {
+                        saveHistory();
+                        return true;
+                    }
+                    else{
+                        return false
+                    }
+                }
+                else {
+                    saveHistory();
 
                     // 更新数据
                     let result = target[p] = newValue; 

@@ -321,7 +321,7 @@ export class ListCommand extends BuiltinCommandBase {
             })
 
             this._printer.printLine("表：", Setting.config.table);
-            this._printer.printTable(this._displayer.displayTodoList(list));
+            this._printer.printTable(this._displayer.displayTodoList(list), undefined, [{}, {}, {}, { color: options.done && /true/.test(options.done) ? "green" : "blue" }]);
         } catch (error) {
             console.trace(error);
         }

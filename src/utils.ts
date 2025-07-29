@@ -16,14 +16,6 @@ export function getAppData(): string {
             return os.homedir();
     }
 }
-// export function createTodoTable(name: string, author: string): TODO_Table {
-//     return {
-//         name,
-//         author,
-//         date: getFormatDate(Date.now()),
-//         list: []
-//     }
-// }
 export function getFormatDate(date: number): string {
     return dayjs(date).format("YYYY-MM-DD HH:mm:ss SSS")
 }

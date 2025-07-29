@@ -22,7 +22,7 @@ export class Displayer{
             .map(todo => {
                 return this.createDisplayTodoItem(
                     todo.index,
-                    this.completionTodo(todo.todo, maxLength),
+                    todo.todo,
                     todo.done ? "✅" : "❌",
                     // todo.done ? "✅" : "❎",
                     // todo.done ? "√" : "×",
@@ -37,8 +37,8 @@ export class Displayer{
    
     private createDisplayTodoItem(index: any, todo: any, done: any, begin: any, end: any, priority: string): any {
         let obj: any = {
-            "状态": done,
             "索引": index,
+            "状态": done,
             "优先级": priority,
             "待办": todo,
             "创建时间": begin,
@@ -56,12 +56,5 @@ export class Displayer{
         }
 
         return obj;
-    }
-
-    private completionTodo(todo: string, max: number): string {
-        assert(todo.length <= max);
-
-        let len = 0;
-        return ((len = max - widthOfStr(todo)) > 0) ? `${todo}${" ".repeat(len)}` : todo;
     }
 }
